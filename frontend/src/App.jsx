@@ -13,6 +13,7 @@ import PropertyForm from './comps/Property/PropertyForm/PropertyForm'
 import PropertyDetails from './comps/Property/Listing/PropertyDetails'
 import AuthStore from './comps/stores/AuthStore'
 import Favorites from './comps/User/UserFavorites/Favorites'
+import MapWithDraw from './comps/Property/MapWithDraw/MapWithDraw'
 
 function App() {
 
@@ -86,6 +87,13 @@ function App() {
             <>
               <Header></Header>
               <Favorites></Favorites>
+            </>
+            }>            
+          </Route>
+          <Route path='/map' element = {
+            <>
+              <Header></Header>
+              <MapWithDraw></MapWithDraw>
             </>
             }>            
           </Route>

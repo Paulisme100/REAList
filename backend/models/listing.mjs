@@ -47,6 +47,9 @@ const Listing = sequelize.define('Listing',
         },
         coordY: {
             type: DataTypes.FLOAT,
+        },
+        geom: {
+            type: DataTypes.GEOMETRY("POINT", 4326)
         }
 
     }, 

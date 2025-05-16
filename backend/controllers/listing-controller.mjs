@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import User from "../models/user.mjs";
 import Listing from "../models/listing.mjs";
 import Locality from "../models/locality.mjs";
@@ -137,6 +137,46 @@ const getListingById = async (req, res, next) => {
     }
 }
 
+const getListingsWithinShape = async (req, res) => {
+  try {
+    const { polygon } = req.body;
+
+    if (!polygon || !polygon.coordinates) {
+      return res.status(400).json({ message: "Invalid polygon data" });
+    }
+
+    const geoJson = JSON.stringify(polygon);
+
+    const listings = await Listing.findAll({
+      where: Sequelize.literal(`
+        ST_Contains(
+          ST_SetSRID(ST_GeomFromGeoJSON('${geoJson}'), 4326),
+          ST_SetSRID(ST_MakePoint("coordY", "coordX"), 4326)
+        )
+      `),
+      include: [
+        {
+          model: Locality,
+          attributes: ['name', 'county', 'county_abbrev']
+        },
+        {
+          model: Image,
+          attributes: ['url'],
+        },
+        {
+          model: User,
+          attributes: ['id', 'name'],
+        },
+      ],
+    });
+
+    return res.status(200).json(listings);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Error querying listings" });
+  }
+};
+
 const addListing = async (req, res, next) => {
     try {
         if(!req.body)
@@ -181,6 +221,11 @@ const addListing = async (req, res, next) => {
 
         fields.coordX = geoData[0].lat
         fields.coordY = geoData[0].lon
+
+        fields.geom = {
+            type: "Point",
+            coordinates: [parseFloat(geoData[0].lon), parseFloat(geoData[0].lat)]
+        }
 
         if(!locality){
             return res.status(400).json({message: "Locality not found!"})
@@ -319,6 +364,7 @@ const deleteById = async (req, res, next) => {
 export default {
     getAllListings,
     getListingById,
+    getListingsWithinShape,
     addListing,
     updateListing,
     deleteById,

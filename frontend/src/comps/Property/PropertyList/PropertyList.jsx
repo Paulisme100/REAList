@@ -124,7 +124,12 @@ const PropertyList = () => {
               </Button>
             </Box>
           
-            
+          <Link to='map'>
+            <Button>
+              Draw area on map
+            </Button>
+          </Link>
+
             {
               Array.isArray(listings) && listings.length > 0 ? (
                 listings.map((listing) => (
