@@ -4,47 +4,90 @@ import {
   MapContainer,
   TileLayer,
   FeatureGroup,
-  useMap
+  useMap,
+  Marker,
+  Popup
 } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
-import L from "leaflet";
+import L, { geoJSON } from "leaflet";
 import Listing from "../Listing/ListingPreview";
 
 const ListingsLayer = ({ listings }) => {
-  const map = useMap();
+  // const map = useMap();
 
-  listings.forEach((listing) => {
-    const marker = L.marker([listing.coordX, listing.coordY])
-      .bindPopup(`<b>${listing.title}</b><br>${listing.address}`);
-    marker.addTo(map);
-  });
+  // listings.forEach((listing) => {
+  //   const marker = L.marker([listing.coordX, listing.coordY])
+  //     .bindPopup(`<b>${listing.title}</b><br>${listing.address}`);
+  //   marker.addTo(map);
+  // });
 
-  return null;
+  // return null;
+
+  return (
+    <>
+      {listings.map((listing) => (
+        <Marker key={listing.id} position={[listing.coordX, listing.coordY]}>
+          <Popup>
+            <strong>{listing.title}</strong><br />
+            {listing.address}
+          </Popup>
+        </Marker>
+      ))}
+    </>
+  );
 };
 
 const MapWithDraw = () => {
   const [listings, setListings] = useState([]);
 
-  const handleCreated = async (e) => {
-    const geoJson = e.layer.toGeoJSON().geometry;
-
+  const fetchListingsWithinShape = async(geoJson) => {
     try {
-      const res = await fetch(`${SERVER_URL}/listings/by-shape`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ polygon: geoJson }),
-      });
+        const res = await fetch(`${SERVER_URL}/listings/by-shape`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ polygon: geoJson })
+        });
 
-      const data = await res.json();
-      setListings(data);
+        return await res.json()
+
     } catch (err) {
       console.error("Failed to fetch listings:", err);
     }
+
+  }
+
+  const handleCreated = async (e) => {
+    const geoJson = e.layer.toGeoJSON().geometry;
+
+    const data = await fetchListingsWithinShape(geoJson);
+    setListings(data);
+    
   };
+
+  const handleEdited = async(e) => {
+
+    const layers = e.layers
+    let firstLayer = null
+    layers.eachLayer(layer => {
+      firstLayer = layer
+    })
+
+    if(firstLayer) {
+      const geoJson = firstLayer.toGeoJSON().geometry
+
+      const data = await fetchListingsWithinShape(geoJson);
+
+      setListings(data)
+    }
+  }
+
+  const handleDeleted = async(e) => {
+    setListings([])
+  }
 
   return (
     <div>
@@ -62,6 +105,8 @@ const MapWithDraw = () => {
           <EditControl
             position="topright"
             onCreated={handleCreated}
+            onEdited={handleEdited}
+            onDeleted={handleDeleted}
             draw={{
               rectangle: false,
               polyline: false,
