@@ -17,44 +17,48 @@ const Header = () => {
 
     return(
         <>
-            <div className='navbar'>
-                <div>
-                    <Link to='/'>
-                        <h1>REAList</h1>
-                    </Link>
-                </div>
-                <div className='ad-prop'>                   
-                    <Link to={path}>
-                        <div style={{textAlign: 'center'}}>
-                            <p>
-                                <AiFillPlusCircle style={{margin: '0 auto', fontSize: '1.5em', cursor: 'pointer'}}></AiFillPlusCircle>
-                            </p>
-                        </div>
-                        <div>
-                            Advertise <br/> Property
-                        </div>
-                    </Link>
-                    
-                </div>
+            <header className='navbar'>
+                <div className='navbar-content'>
+                    <div className="logo">
+                        <Link to='/'>
+                            <h1>REAList</h1>
+                        </Link>
+                    </div>
 
-                <div className='userArea' style={{cursor: 'pointer'}}>
-                    {
-                        user ? (
-                            <Link to='/profile'>
-                                <AiOutlineUser></AiOutlineUser>
-                                <p>{user.name}</p>
-                            </Link>
-                            
-                        ) : (
-                            <Link to='/login'>
-                                <AiOutlineUser></AiOutlineUser>
-                                <p>No user</p>
-                            </Link>
-                        )
-                    }
-                    
+                    <div className='ad-prop action'>                   
+                        <Link to={path}>
+                            <div style={{textAlign: 'center'}}>
+                                <p>
+                                    <AiFillPlusCircle style={{margin: '0 auto', fontSize: '1.5em', cursor: 'pointer'}}></AiFillPlusCircle>
+                                </p>
+                            </div>
+                            <div>
+                                Advertise <br/> Property
+                            </div>
+                        </Link>
+                        
+                    </div>
+
+                    <div className='userArea action' style={{cursor: 'pointer'}}>
+                        {
+                            user ? (
+                                <Link to='/profile'>
+                                    <AiOutlineUser></AiOutlineUser>
+                                    <p>{user.name}</p>
+                                </Link>
+                                
+                            ) : (
+                                <Link to='/login'>
+                                    <AiOutlineUser></AiOutlineUser>
+                                    <p>No user</p>
+                                </Link>
+                            )
+                        }
+                        
+                    </div>
+                   
                 </div>
-            </div>
+            </header>
         </>
     )
 

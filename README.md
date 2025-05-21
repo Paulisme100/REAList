@@ -1,1 +1,1 @@
-Bachelor Thesis - a real estate web platform that manages property listings.                                                                6,1 Bot                                                                                                         
+Bachelor Thesis - a real estate web platform that manages property listings.

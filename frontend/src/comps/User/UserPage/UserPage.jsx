@@ -11,7 +11,10 @@ import {
     AccordionDetails,
     TextField,
     Typography,
-    Box
+    Box,
+    Paper,
+    Stack,
+    Divider
   } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
@@ -51,7 +54,7 @@ const UserPage = () => {
         const { old, new: new_password, confirm } = passwordData
         
         if (new_password !== confirm) {
-            console.warn('New passwords do not match')
+            alert('New passwords do not match')
             return
         }
         
@@ -65,85 +68,97 @@ const UserPage = () => {
         nav('/')
     }
     
+    
+    return (
+    <Box maxWidth="600px" mx="auto" mt={5} px={2}>
 
-    return(
-        <>
-            { user ? (
-                <div>
-                    <h2>User Page</h2>
-                    <div>{user.email}</div>
-                    <div>{user.name}</div>
-                    <div>{user.role}</div>
-                    <Link to='/user-listings'>
-                        <Button style={{cursor: 'pointer'}}>
-                            Your listings
-                        </Button>
-                        <br />
-                    </Link>
-                    <Link to='/favorites'>
-                        <Button style={{cursor: 'pointer'}}>
-                            Favorites
-                        </Button>
-                        <br />
-                    </Link>
+        <Paper elevation={3} sx={{ padding: 4 }}>
 
-                    <Accordion>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography>Change Password</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <Box
-                            component="form"
-                            noValidate
-                            autoComplete="off"
-                            sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
-                            onSubmit={handleSubmit}
-                            >
-                            <TextField
-                                label="Old Password"
-                                type="password"
-                                fullWidth
-                                required
-                                size="small"
-                                value={passwordData.old}
-                                onChange={(e) => {setPasswordData({ ...passwordData, old: e.target.value })}}
-                            />
-                            <TextField
-                                label="New Password"
-                                type="password"
-                                fullWidth
-                                required
-                                size="small"
-                                value={passwordData.new}
-                                onChange={(e) => setPasswordData({ ...passwordData, new: e.target.value })}
-                            />
-                            <TextField
-                                label="Confirm New Password"
-                                type="password"
-                                fullWidth
-                                required
-                                size="small"
-                                value={passwordData.confirm}
-                                onChange={(e) => setPasswordData({ ...passwordData, confirm: e.target.value })}
-                            />
-                            <Button variant="contained" color="primary" type="submit">
-                                Submit
-                            </Button>
-                            </Box>
-                        </AccordionDetails>
-                    </Accordion>
+        <Typography variant="h4" gutterBottom>
+            User Account
+        </Typography>
 
+        <Divider sx={{ my: 2 }} />
 
-                    <Button style={{cursor: 'pointer'}} onClick={() => {clearTokenCookie(); logout(); nav('/user-listings')}}>Log out</Button>
-                </div>
-                ) : (
-                    <div>
-                        User not connected
-                    </div>
-                )
-            }
-        </>
-    )
+        <Box mb={3}>
+            <Typography variant="subtitle1">
+                <strong>Email:</strong> {user.email}
+            </Typography>
+
+            <Typography variant="subtitle1">
+                <strong>Name:</strong> {user.name}
+            </Typography>
+
+            <Typography variant="subtitle1">
+                <strong>Role:</strong> {user.role}
+            </Typography>
+        </Box>
+
+        <Stack direction="row" spacing={2} mb={3}>
+
+            <Link to="/user-listings" style={{ textDecoration: 'none' }}>
+                <Button variant="contained" color="primary">Your Listings</Button>
+            </Link>
+
+            <Link to="/favorites" style={{ textDecoration: 'none' }}>
+                <Button variant="contained" color="secondary">Favorites</Button>
+            </Link>
+
+        </Stack>
+
+        <Accordion>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>Change Password</Typography>
+            </AccordionSummary>
+
+            <AccordionDetails>
+                <Box
+                    component="form"
+                    noValidate
+                    autoComplete="off"
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+                    onSubmit={handleSubmit}
+                >
+                    
+                    <TextField label="Old Password" type="password" fullWidth required size="small"
+                        value={passwordData.old}
+                        onChange={(e) => setPasswordData({ ...passwordData, old: e.target.value })}
+                    />
+
+                    <TextField label="New Password" type="password" fullWidth required size="small"
+                        value={passwordData.new}
+                        onChange={(e) => setPasswordData({ ...passwordData, new: e.target.value })}
+                    />
+
+                    <TextField label="Confirm New Password" type="password" fullWidth required size="small"
+                        value={passwordData.confirm}
+                        onChange={(e) => setPasswordData({ ...passwordData, confirm: e.target.value })}
+                    />
+
+                    <Button variant="contained" color="primary" type="submit">
+                        Update Password
+                    </Button>
+
+                </Box>
+            </AccordionDetails>
+        </Accordion>
+
+        <Divider sx={{ my: 3 }} />
+
+        <Button
+            variant="outlined"
+            color="error"
+            onClick = {() => {
+                clearTokenCookie();
+                logout();
+                nav('/');
+            }}
+        >
+            Log Out
+        </Button>
+        </Paper>
+    </Box>
+    );
 }
 
 export default UserPage

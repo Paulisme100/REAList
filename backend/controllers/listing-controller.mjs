@@ -235,10 +235,12 @@ const addListing = async (req, res, next) => {
 
         const listing = await Listing.create(fields)
 
-        const images = req.files.map(file => Image.create({
-            url: `/uploads/${file.filename}`,
-            ListingId: listing.id
-        }))
+        const images = req.files.map(file => {
+            Image.create({
+                url: `/uploads/${file.filename}`,
+                ListingId: listing.id
+            })
+        })
 
         await Promise.all(images)
 
