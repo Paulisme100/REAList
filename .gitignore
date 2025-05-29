@@ -29,3 +29,4 @@ dist-ssr
 backend/real-estate-image-moderation-key.json
 .env
 >>>>>>> 852b52f (Removed Google Vision Api key):.gitignore
+test-ignore.txt
