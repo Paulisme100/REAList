@@ -1,0 +1,92 @@
+/* .navbar {
+    width: 90vw;
+    height: 10vh;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: 1.5em;
+    padding-top: 0.75em;
+} */
+
+/* Header.css */
+
+/* Header.css */
+
+.navbar {
+  width: 100%;
+  min-width: 50vw;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: #333;
+}
+
+.navbar h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0077cc;
+  margin: 0;
+}
+
+.ad-prop,
+.userArea {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.ad-prop svg,
+.userArea svg {
+  font-size: 1.8rem;
+  color: #0077cc;
+}
+
+.ad-prop:hover svg,
+.userArea:hover svg {
+  color: #005fa3;
+}
+
+.ad-prop div,
+.userArea p {
+  margin: 0;
+  line-height: 1.2;
+}
+
+@media screen and (max-width: 768px) {
+
+    .navbar {
+        min-width: none;
+    }
+
+  .navbar-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .ad-prop,
+  .userArea {
+    align-self: flex-end;
+  }
+
+  .navbar h1 {
+    font-size: 1.6rem;
+  }
+}

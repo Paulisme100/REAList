@@ -1,0 +1,1 @@
+Bachelor Thesis - a real estate web platform that manages property listings.

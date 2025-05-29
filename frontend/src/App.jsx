@@ -1,0 +1,144 @@
+import { useState, useEffect } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+import {HashRouter, Routes, Route} from 'react-router-dom'
+import PropertyList from './comps/Property/PropertyList/PropertyList'
+import Header from './comps/Header/Header'
+import SignupLogin from './comps/SignupLogin/SignupLogin'
+import UserPage from './comps/User/UserPage/UserPage'
+import UserListings from './comps/User/UserListings/UserListings'
+import getUserData from './comps/fetches/getUserProfile'
+import PropertyForm from './comps/Property/PropertyForm/PropertyForm'
+import PropertyDetails from './comps/Property/Listing/PropertyDetails'
+import AuthStore from './comps/stores/UserAuthStore'
+import Favorites from './comps/User/UserFavorites/Favorites'
+import MapWithDraw from './comps/Property/MapWithDraw/MapWithDraw'
+import AgencyRegistration from './comps/Agency/AgencyRegistration/AgencyRegistration'
+import AgencyPage from './comps/Agency/AgencyPage/AgencyPage'
+import AgencyAuthStore from './comps/stores/AgencyAuthStore'
+import agencyApi from './comps/fetches/agency/agencyApi'
+
+function App() {
+
+  const {login : loginUser} = AuthStore()
+  const {login: loginAgency} = AgencyAuthStore()
+  
+  useEffect(() => {
+    const authenticate = async () => {
+
+      try {
+        const user = await getUserData();
+        if(user) {
+            if (user.accountType  == 'user') {
+              loginUser(user);
+              console.log('reg user logged: ' + user.accountType)
+              return; 
+            }
+
+            if (user.accountType  == 'agency') {
+              loginAgency(user)
+              console.log('agency logged: ' + user.company_email)
+              return; 
+            }
+        }
+
+      } catch (userErr) {
+        throw new Error(userErr)
+      }
+
+    };
+
+    authenticate();
+  }, [])
+
+  
+
+  return (
+    <>
+      <HashRouter>
+        <Routes>
+          <Route path='/' element= {
+            <>
+              <Header></Header>
+              <PropertyList></PropertyList>
+            </>
+          }>
+          </Route>
+          <Route path='/listings' element= {
+            <>
+              <Header></Header>
+              <PropertyList></PropertyList>
+            </>
+          }>
+          </Route>
+          <Route path='/listings/:lid' element= {
+            <>
+              <Header></Header>
+              <PropertyDetails></PropertyDetails>
+            </>
+          }>
+          </Route>
+          <Route path='/login' element= {
+            <>
+              <Header></Header>
+              <SignupLogin></SignupLogin>
+            </>
+          }>
+          </Route>
+          <Route path='/profile' element = {
+            <>
+              <Header></Header>
+              <UserPage></UserPage>
+            </>
+            }>            
+          </Route>
+          <Route path='/add-property' element = {
+            <>
+              <Header></Header>
+              <PropertyForm></PropertyForm>
+            </>
+          }>            
+          </Route>
+          <Route path='/user-listings' element = {
+            <>
+              <Header></Header>
+              <UserListings></UserListings>
+            </>
+            }>            
+          </Route>
+          <Route path='/favorites' element = {
+            <>
+              <Header></Header>
+              <Favorites></Favorites>
+            </>
+            }>            
+          </Route>
+          <Route path='/map' element = {
+            <>
+              <Header></Header>
+              <MapWithDraw></MapWithDraw>
+            </>
+            }>            
+          </Route>
+          <Route path='/agency-registration' element = {
+            <>
+              <Header></Header>
+              <AgencyRegistration></AgencyRegistration>
+            </>
+            }>            
+          </Route>
+          <Route path='/agency-main' element = {
+            <>
+              <Header></Header>
+              <AgencyPage></AgencyPage>
+            </>
+            }>            
+          </Route>
+        </Routes>
+      </HashRouter>
+    </>
+  )
+}
+
+export default App
