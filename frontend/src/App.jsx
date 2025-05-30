@@ -18,6 +18,7 @@ import AgencyRegistration from './comps/Agency/AgencyRegistration/AgencyRegistra
 import AgencyPage from './comps/Agency/AgencyPage/AgencyPage'
 import AgencyAuthStore from './comps/stores/AgencyAuthStore'
 import agencyApi from './comps/fetches/agency/agencyApi'
+import AgencyData from './comps/Agency/AgencyData/AgencyData'
 
 function App() {
 
@@ -39,6 +40,7 @@ function App() {
             if (user.accountType  == 'agency') {
               loginAgency(user)
               console.log('agency logged: ' + user.company_email)
+              console.log(user)
               return; 
             }
         }
@@ -132,6 +134,13 @@ function App() {
             <>
               <Header></Header>
               <AgencyPage></AgencyPage>
+            </>
+            }>            
+          </Route>
+          <Route path='/agency-data' element = {
+            <>
+              <Header></Header>
+              <AgencyData></AgencyData>
             </>
             }>            
           </Route>

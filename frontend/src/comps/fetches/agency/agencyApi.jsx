@@ -39,8 +39,35 @@ const fetchProfile = async () => {
 
 }
 
+const fetchAgents = async () => {
+    const res = await fetch(`${SERVER_URL}/agencies/agents`, {
+        credentials: 'include'
+    })
+
+    return await res.json()
+}
+
+const updateAgencyData  = async (formData) => {
+
+    const res = await fetch(`${SERVER_URL}/agencies`, {
+        method: 'PUT',
+        body: formData,
+        credentials: 'include'
+    })
+
+    if (res.ok) {
+      const updatedAgency = await res.json();
+      return updatedAgency
+    } else {
+      const error = await res.json();
+      alert("Error updating agency: " + error.message);
+    }
+}
+
 export default {
     registerAgency,
     logInAsAgency,
-    fetchProfile
+    fetchProfile,
+    fetchAgents,
+    updateAgencyData
 }

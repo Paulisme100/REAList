@@ -1,6 +1,9 @@
 import Agency from '../models/agency.mjs'
+import User from '../models/user.mjs'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import fs from "fs";
+import path from "path";
 
 const getAllAgencies = async (req, res, next) => {
 
@@ -29,6 +32,27 @@ const getAllAgencies = async (req, res, next) => {
     }
 }
 
+const getAllAgents = async (req, res, next) => {
+
+    if(!req.user.id){
+        return res.status(400).json({message: 'Company must be identified first!'})
+    }
+
+    const agents = await User.findAll({
+        where: {
+            AgencyId: req.user.id
+        },
+        attributes:{ exclude: ["password"]}
+    })
+
+    if(!agents){
+        res.status(404).json({message: "No agents found in this company!"})
+    } else {
+        res.status(200).json(agents)
+    }
+
+}
+
 const registerAgency = async (req, res, next) => {
     try {
         if(!req.body)
@@ -53,24 +77,37 @@ const registerAgency = async (req, res, next) => {
 
 const updateAgencyAccount = async (req, res, next) => {
     try {
+
         if(!req.body)
         {
             res.status(400).json({message: 'Empty request body'})
         }
 
-        const agency = await Agency.findByPk(req.params.id)
+        const agency = await Agency.findByPk(req.user.id)
         if(!agency)
         {
             res.status(404).json({message: 'Agency not found!'})
         }
 
-        agency.company_name = req.body.company_name
-        agency.company_email = req.body.company_email
-        agency.account_password = await bcrypt.hash(req.body.account_password, 10)
-        agency.company_phone = req.body.company_phone
-        agency.head_office_address = req.body.head_office_address
+        const fields = req.body;
+        if (req.file) {
 
-        await agency.save()
+            const oldLogoPath = agency.logo_url
+            ? path.join(process.cwd(), "uploads", "agency-logos", path.basename(agency.logo_url))
+            : null;
+
+            fields.logo_url = `/uploads/agency-logos/${req.file.filename}`;
+
+            if (oldLogoPath && fs.existsSync(oldLogoPath)) {
+                fs.unlink(oldLogoPath, (err) => {
+                    if (err) console.error("Failed to delete old logo:", err);
+                });
+            }
+        }
+
+        await agency.update(fields)
+        
+        res.status(200).json(agency);
         
     } catch (err) {
         console.log(err)
@@ -152,6 +189,10 @@ const authenticate = async (req, res, next) => {
                 maxAge: 3600000
             })
 
+            payload.head_office_address = agency.head_office_address
+            payload.commission_at_sale = agency.commission_at_sale
+            payload.commission_at_rent = agency.commission_at_rent
+            payload.logo_url = agency.logo_url
             res.status(200).json(payload)
         } else {
             res.status(401).json({message: 'Invalid credentials!'})
@@ -182,10 +223,12 @@ const lougout = async (req, res, next) => {
 
 export default {
     getAllAgencies,
+    getAllAgents,
     registerAgency,
     authenticate,
     updateAgencyAccount,
     deleteAgencyAccount,
     getAgencyProfile,
-    lougout
+    lougout,
+    
 }

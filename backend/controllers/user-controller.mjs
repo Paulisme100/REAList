@@ -144,7 +144,7 @@ const getUserProfile = async (req, res, next) => {
     if (req.user.accountType === 'agency') {
         const agencyProfile = await Agency.findOne({
             where: { company_email: req.user.company_email },
-            attributes: { exclude: ['password'] }
+            attributes: { exclude: ['account_password'] }
         });
 
         if (!agencyProfile) {

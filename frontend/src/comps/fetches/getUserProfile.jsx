@@ -5,9 +5,6 @@ const getUserData = async () => {
         const url = `${SERVER_URL}/users/profile`
         const response = await fetch(url, {
           method: 'get',
-          headers: {
-            'Content-Type': 'application/json'
-          },
           credentials: 'include'
         })
         if(!response.ok){
