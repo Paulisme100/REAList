@@ -130,11 +130,11 @@ const AgencyPage = () => {
                 </Grid>
 
                 <Divider sx={{ marginY: 4 }} />
-
+                
                 <Typography variant="h5" gutterBottom>
                     Your Agents ({agents.length})
                 </Typography>
-                
+
                 {
                     agents.length === 0 ? (
                         <Typography>No agents registered to your agency yet.</Typography>

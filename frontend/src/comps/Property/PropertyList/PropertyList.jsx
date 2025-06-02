@@ -13,8 +13,10 @@ import {
   MenuItem,
   Button,
   Typography,
-  TextField
+  TextField,
+  Collapse
 } from "@mui/material";
+import TuneIcon from "@mui/icons-material/Tune";
 
 
 const PropertyList = () => {
@@ -26,6 +28,14 @@ const PropertyList = () => {
     const [selectedCounty, setSelectedCounty] = useState("");
     const [selectedLocality, setSelectedLocality] = useState("");
     const [searchText, setSearchText] = useState("");
+    const [minPrice, setMinPrice] = useState('');
+    const [maxPrice, setMaxPrice] = useState('');
+    const [transactionType, setTransactionType] = useState('');
+    const [showAdvanced, setShowAdvanced] = useState(false);
+    const [bedrooms, setBedrooms] = useState('');
+    const [bathrooms, setBathrooms] = useState('');
+    const [constructionYear, setConstructionYear] = useState('');
+    const [minSquareMeters, setMinSquareMeters] = useState('');
 
     useEffect(() => {
         
@@ -55,7 +65,7 @@ const PropertyList = () => {
     }
 
     const handleFilterChange = () => {
-      fetchPropertiesByFields(selectedCounty, selectedLocality, searchText).then(data => setListings(data));
+      fetchPropertiesByFields(selectedCounty, selectedLocality, searchText, '', transactionType, minPrice, maxPrice, bedrooms, bathrooms, constructionYear, minSquareMeters).then(data => setListings(data));
     };
 
     return (
@@ -114,6 +124,19 @@ const PropertyList = () => {
                 </Select>
               </FormControl>
 
+              <FormControl sx={{ minWidth: 180 }}>
+                    <InputLabel>Transaction Type</InputLabel>
+                    <Select
+                      value={transactionType}
+                      label="Transaction Type"
+                      onChange={(e) => setTransactionType(e.target.value)}
+                    >
+                      <MenuItem value=""><em>Any</em></MenuItem>
+                      <MenuItem value="sale">Sale</MenuItem>
+                      <MenuItem value="rent">Rent</MenuItem>
+                    </Select>
+              </FormControl>
+
               <Button
                 variant="contained"
                 color="primary"
@@ -123,6 +146,72 @@ const PropertyList = () => {
                 Apply
               </Button>
             </Box>
+
+
+            <Button
+              variant="outlined"
+              startIcon={<TuneIcon sx={{ transform: showAdvanced ? "rotate(90deg)" : "rotate(0deg)", transition: "0.3s" }} />}
+              onClick={() => setShowAdvanced((prev) => !prev)}
+            >
+              Advanced Filters
+            </Button>
+            <Collapse in={showAdvanced} timeout="auto" unmountOnExit>
+                <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2, mt: 2 }}>
+
+                  <TextField
+                    label="Min Price"
+                    type="number"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(e.target.value)}
+                  />
+
+                   <TextField
+                    label="Max Price"
+                    type="number"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(e.target.value)}
+                  />
+
+                  <FormControl sx={{ minWidth: 140 }}>
+                    <TextField
+                      label="Number of Bedrooms"
+                      type="number"
+                      value={bedrooms}
+                      onChange={(e) => setBedrooms(e.target.value)}
+                    />
+                  </FormControl>
+
+                  <FormControl sx={{ minWidth: 140 }}>
+                    <TextField
+                      label="Number of Bathrooms"
+                      type="number"
+                      value={bathrooms}
+                      onChange={(e) => setBathrooms(e.target.value)}
+                    />
+                  </FormControl>
+
+                  <FormControl sx={{ minWidth: 180 }}>
+                    <TextField
+                      label="Construction Year (Starting From)"
+                      type="number"
+                      value={constructionYear}
+                      onChange={(e) => setConstructionYear(e.target.value)}
+                    />
+                  </FormControl>
+
+                  <FormControl sx={{ minWidth: 180 }}>
+                    <TextField
+                      label="Min Sq Meters"
+                      type="number"
+                      value={minSquareMeters}
+                      onChange={(e) => setMinSquareMeters(e.target.value)}
+                    />
+                  </FormControl>
+
+                </Box>
+              </Collapse>
+              <br/>
+
           
           <Link to='map'>
             <Button>

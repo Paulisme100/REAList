@@ -83,7 +83,7 @@ const AgencyData = () => {
 
     return (
         <>
-            <Paper>
+            <Paper style={{padding: '1.5em'}}>
                 <Typography variant="h5" gutterBottom>
                     Edit Agency Data
                 </Typography>

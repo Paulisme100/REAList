@@ -15,7 +15,17 @@ const STOP_WORDS = new Set([
     'and', 'or', 'of', 'to', 'from', 'into', 'onto', 'over', 'under', 
     'camere', 'zona', 'cartier', 'cu', 'spre', 'langa', 'din', 'aproape', 'de',
     'pentru', 'despre', 'inspre'
-  ]);
+]);
+
+const checkInt = (val) => {
+    const parsed = parseInt(val);
+    return isNaN(parsed) ? null : parsed;
+};
+
+const checkFloat = (val) => {
+    const parsed = parseFloat(val);
+    return isNaN(parsed) ? null : parsed;
+};
 
 const getAllListings = async (req, res, next) => {
     try {
@@ -44,9 +54,7 @@ const getAllListings = async (req, res, next) => {
                     [Op.or]: keywords.map(word => ({
                         [Op.iLike]: `%${word}%`
                     }))
-                }
-            } else {
-                filterQuery.where.title = ""
+                } 
             }
         }
 
@@ -56,6 +64,62 @@ const getAllListings = async (req, res, next) => {
 
         if(req.query.ad_status) {
             filterQuery.where.ad_status = req.query.ad_status
+        }
+
+        if(req.query.transactionType) {
+            filterQuery.where.transactionType = req.query.transactionType.toLowerCase()
+        }
+
+        if(req.query.minPrice || req.query.maxPrice) {
+
+            if(checkFloat(req.query.minPrice) &&  checkFloat(req.query.maxPrice))
+            {
+                filterQuery.where.price = {}
+
+                if(req.query.minPrice)
+                {
+                    filterQuery.where.price[Op.gte] = parseFloat(req.query.minPrice)
+                }
+
+                if(req.query.maxPrice)
+                {
+                    filterQuery.where.price[Op.lte] = parseFloat(req.query.maxPrice)
+                }
+            }
+        }
+
+        // if(req.query.maxPrice) {
+        //     filterQuery.where.price = {
+        //         [Op.lte]: parseFloat(req.query.maxPrice)
+        //     }
+        // }
+
+        if (req.query.bedrooms) {
+            filterQuery.where.bedrooms = parseInt(req.query.bedrooms);
+        }
+
+        if (req.query.bathrooms) {
+            filterQuery.where.bathrooms = parseInt(req.query.bathrooms);
+        }
+
+        if (req.query.constructionYear) {
+            const parsed = checkInt(req.query.constructionYear)
+            if(!isNaN(parsed) && parsed > 0)
+            {
+                filterQuery.where.constructionYear = {
+                    [Op.gte]: parsed
+                };
+            }
+        }
+        
+        if (req.query.minSquareMeters) {
+            const parsed = checkInt(req.query.minSquareMeters)
+            if(!isNaN(parsed) && parsed > 0)
+            {
+                filterQuery.where.squareMeters = {
+                    [Op.gte]: parsed
+                };
+            }
         }
 
         const localityRelObj = {
