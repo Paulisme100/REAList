@@ -19,6 +19,7 @@ import AgencyPage from './comps/Agency/AgencyPage/AgencyPage'
 import AgencyAuthStore from './comps/stores/AgencyAuthStore'
 import agencyApi from './comps/fetches/agency/agencyApi'
 import AgencyData from './comps/Agency/AgencyData/AgencyData'
+import AgentProfile from './comps/Agency/AgentProfile/AgentProfile'
 
 function App() {
 
@@ -143,6 +144,13 @@ function App() {
               <AgencyData></AgencyData>
             </>
             }>            
+          </Route>
+          <Route path='/agents/:id' element= {
+            <>
+              <Header></Header>
+              <AgentProfile></AgentProfile>
+            </>
+          }>
           </Route>
         </Routes>
       </HashRouter>

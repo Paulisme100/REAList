@@ -129,28 +129,30 @@ const AgencyPage = () => {
                     </Box>
                 </Grid>
 
-                <Divider sx={{ marginY: 4 }} />
                 
-                <Typography variant="h5" gutterBottom>
-                    Your Agents ({agents.length})
-                </Typography>
-
-                {
-                    agents.length === 0 ? (
-                        <Typography>No agents registered to your agency yet.</Typography>
-                    ) : (
-                        <Grid container spacing={2}>
-                            {
-                                agents.map(agent => (
-                                    <Grid item key={agent.id} xs={12} sm={6} md={4}>
-                                        <AgentCard key={agent.id} agent={agent}></AgentCard>
-                                    </Grid>
-                                ))
-                            }
-                        </Grid>
-                    )
-                }
             </Grid>
+
+            <Divider sx={{ marginY: 4 }} />
+                
+            <Typography variant="h5" gutterBottom>
+                Your Agents ({agents.length})
+            </Typography>
+
+            {
+                agents.length === 0 ? (
+                    <Typography>No agents registered to your agency yet.</Typography>
+                ) : (
+                    <Grid container spacing={2}>
+                        {
+                            agents.map(agent => (
+                                <Grid item key={agent.id} xs={12} sm={6} md={4}>
+                                    <AgentCard key={agent.id} agent={agent}></AgentCard>
+                                </Grid>
+                            ))
+                        }
+                    </Grid>
+                )
+            }
         </Paper>
     )
 

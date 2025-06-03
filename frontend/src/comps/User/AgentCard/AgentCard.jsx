@@ -1,4 +1,5 @@
-import {Card, CardContent, Typography, Avatar, Box } from "@mui/material"
+import {Card, CardContent, Typography, Avatar, Box, Button } from "@mui/material"
+import { Link } from "react-router-dom"
 
 const AgentCard = ({agent}) => {
 
@@ -12,6 +13,17 @@ const AgentCard = ({agent}) => {
             <Box>
                 <Typography variant="h6">{agent.name}</Typography>
                 <Typography variant="body2">{agent.email}</Typography>
+            </Box>
+            <Box>
+                <Button
+                    variant="outlined"
+                    fullWidth
+                    sx={{ mt: 2 }}
+                    component={Link}
+                    to={`/agents/${agent.id}`}
+                >
+                    View Profile
+                </Button>
             </Box>
 
         </Card>

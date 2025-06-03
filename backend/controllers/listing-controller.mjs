@@ -43,6 +43,10 @@ const getAllListings = async (req, res, next) => {
             filterQuery.where.UserId = { [Op.ne]: null };
         }
 
+        if(req.query.UserId) {
+            filterQuery.where.UserId = req.query.UserId
+        }
+
         if(req.query.title) {
 
             const rawKeywords = req.query.title.trim().split(/\s+/)

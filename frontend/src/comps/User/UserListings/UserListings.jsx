@@ -20,19 +20,29 @@ const UserListings = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchListings = async () => {
-    setLoading(true);
-    try {
-      const [active, inactive] = await Promise.all([
-        fetchPropertiesByStatus("active"),
-        fetchPropertiesByStatus("inactive")
-      ]);
-      setActiveListings(active.filter(l => l.UserId === user.id));
-      setInactiveListings(inactive.filter(l => l.UserId === user.id));
-    } catch (err) {
-      console.error("Error fetching listings:", err);
-    } finally {
-      setLoading(false);
-    }
+
+      setLoading(true);
+
+      try {
+        const [active, inactive] = await Promise.all([
+          
+            fetchPropertiesByStatus("active"),
+            fetchPropertiesByStatus("inactive")
+        ]);
+
+        setActiveListings(active.filter(l => l.UserId === user.id));
+
+        setInactiveListings(inactive.filter(l => l.UserId === user.id));
+
+      } catch (err) {
+
+        console.error("Error fetching listings:", err);
+
+      } finally {
+
+        setLoading(false);
+
+      }
   };
 
   useEffect(() => {
