@@ -14,7 +14,8 @@ import {
   Avatar,
   Box,
   Paper,
-  Tooltip
+  Tooltip,
+  Alert
 } from "@mui/material";
 import AgentCard from "../../User/AgentCard/AgentCard";
 
@@ -27,7 +28,8 @@ i want to offer them what other real-estate platforms didn't offer them.
 const AgencyPage = () => {
 
 
-    const [agents, setAgents] = useState([])
+    const [acceptedAgents, setAcceptedAgents] = useState([])
+    const [pendingAgents, setPendingAgents] = useState([])
     const {agency, login: loginAgency, logout: logoutAgency} = AgencyAuthStore()
     const nav = useNavigate()
 
@@ -50,18 +52,46 @@ const AgencyPage = () => {
         console.log(message)
     }
 
-    useEffect(() => {
-        agencyApi.fetchAgents().then(agentsArray => {
-            setAgents(agentsArray)
-            console.log(agentsArray)
-        })
-    }, [agency])
+    async function ensureNotificationPermission() {
+        if (Notification.permission === 'granted') return true;
 
-    useEffect(()=>{
-        if(agency){
-            console.log(agency)
+        if (Notification.permission === 'default') {
+            const result = await Notification.requestPermission();
+            return result === 'granted';
         }
-    }, [])
+
+        return false;
+    }
+
+    const subscribeAgencyToPush = async (agencyId) => {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription =  await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: 'BCj0rdS4ziUUDLy3pGa43D_D5Aau6ncPLQfJ5WV0WWBBtBEO-djbxphdExnW-G-LYCzaD0ztEUYsgzXP2nHZN4I'
+        })
+
+        const res = await fetch(`${SERVER_URL}/agencies/save-subscription`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                agencyId, 
+                subscription
+            })
+        })
+
+    }
+
+    const fetchAgents = () => {
+        agencyApi.fetchAgentsByStatus("accepted").then(agentsArray => setAcceptedAgents(agentsArray));
+        agencyApi.fetchAgentsByStatus("pending").then(agentsArray => setPendingAgents(agentsArray));
+    };
+
+    useEffect(() => {
+        if (agency) {
+            fetchAgents();
+        }
+    }, [agency])
 
     if(!agency || !agency.logo_url){
         <Typography>
@@ -126,6 +156,24 @@ const AgencyPage = () => {
                         >
                             Log Out
                         </Button>
+                        <Button
+                            onClick={() => {
+                                if (!agency) 
+                                    return;
+
+                                const setupPush = async () => {
+                                    const granted = await ensureNotificationPermission();
+                                    if (granted) {
+                                        await subscribeAgencyToPush(agency.id);
+                                        alert("You subscribed to push notifications")
+                                    }
+                                };
+
+                                setupPush();
+                            }}
+                        >
+                            Enable notifications
+                        </Button>
                     </Box>
                 </Grid>
 
@@ -135,16 +183,16 @@ const AgencyPage = () => {
             <Divider sx={{ marginY: 4 }} />
                 
             <Typography variant="h5" gutterBottom>
-                Your Agents ({agents.length})
+                Your Agents ({acceptedAgents.length})
             </Typography>
 
             {
-                agents.length === 0 ? (
+                acceptedAgents.length === 0 ? (
                     <Typography>No agents registered to your agency yet.</Typography>
                 ) : (
                     <Grid container spacing={2}>
                         {
-                            agents.map(agent => (
+                            acceptedAgents.map(agent => (
                                 <Grid item key={agent.id} xs={12} sm={6} md={4}>
                                     <AgentCard key={agent.id} agent={agent}></AgentCard>
                                 </Grid>
@@ -153,6 +201,28 @@ const AgencyPage = () => {
                     </Grid>
                 )
             }
+
+            {pendingAgents.length > 0 && (
+                <>
+                    <Divider sx={{ my: 4 }} />
+                    <Alert severity="warning" sx={{ mb: 2 }}>
+                        You have {pendingAgents.length} agent{pendingAgents.length > 1 ? 's' : ''} awaiting approval.
+                    </Alert>
+                    <Typography variant="h5" gutterBottom color="error">
+                        Pending Agent Requests
+                    </Typography>
+                    <Grid container spacing={2}>
+                        {
+                            pendingAgents.map(agent => (
+                                <Grid item key={agent.id} xs={12} sm={6} md={4}>
+                                    <AgentCard
+                                        agent={agent} refreshAgents={fetchAgents}/>
+                                </Grid>
+                            ))
+                        }
+                    </Grid>
+                </>
+            )}
         </Paper>
     )
 

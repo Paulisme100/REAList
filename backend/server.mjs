@@ -15,7 +15,7 @@ const app = express()
 app.use(express.json())
 app.use('/uploads', express.static('uploads'))
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'http://localhost:4173',
     credentials: true
 }))
 app.use(cookieParser())
@@ -32,7 +32,7 @@ try {
 } catch (err) {
     console.warn(err)
 }
-// importCSV('./sources/localities.csv').catch(console.error);
+//importCSV('./sources/localities.csv').catch(console.error);
 
 app.listen(8080, ()  => {
     console.log('Server started on port 8080')

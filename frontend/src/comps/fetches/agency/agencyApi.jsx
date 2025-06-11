@@ -47,6 +47,14 @@ const fetchAgents = async () => {
     return await res.json()
 }
 
+const fetchAgentsByStatus = async (agentStatus  = '') => {
+    const res = await fetch(`${SERVER_URL}/agencies/agents?agentStatus=${agentStatus}`, {
+        credentials: 'include'
+    })
+
+    return await res.json()
+}
+
 const updateAgencyData  = async (formData) => {
 
     const res = await fetch(`${SERVER_URL}/agencies`, {
@@ -64,10 +72,30 @@ const updateAgencyData  = async (formData) => {
     }
 }
 
+const changeAgentStatus = async (agentId = '', status = '') => {
+
+    const queryBody = {
+        agentStatus: status
+    }
+
+    const res = await fetch(`${SERVER_URL}/users/${agentId}`,{
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(queryBody)
+    })
+
+    return await res.json()
+}
+
 export default {
     registerAgency,
     logInAsAgency,
     fetchProfile,
     fetchAgents,
-    updateAgencyData
+    fetchAgentsByStatus,
+    updateAgencyData,
+    changeAgentStatus
 }

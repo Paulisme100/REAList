@@ -35,7 +35,7 @@ const AgentProfile = () => {
                 const listtingsData = await listResp.json()
 
                 setAgent(agentData[0])
-                setListings(listtingsData)
+                setListings(Array.isArray(listtingsData) ? listtingsData : []);
 
             } catch (err) {
                 console.error("Error loading agent or listings:", err);

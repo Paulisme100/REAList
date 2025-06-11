@@ -38,10 +38,18 @@ const getAllAgents = async (req, res, next) => {
         return res.status(400).json({message: 'Company must be identified first!'})
     }
 
-    const agents = await User.findAll({
+    let filterQuery = { 
         where: {
             AgencyId: req.user.id
-        },
+        }
+    }
+
+    if(req.query.agentStatus){
+        filterQuery.where.agentStatus = req.query.agentStatus
+    }
+
+    const agents = await User.findAll({
+        ...filterQuery,
         attributes:{ exclude: ["password"]}
     })
 
@@ -153,9 +161,9 @@ const deleteAgent = async (req, res, next) => {
 
 const authenticate = async (req, res, next) => {
     try {
-        if(!req.body)
+        if(!req.body || !req.body.company_email ||  !req.body.account_password)
             {
-                res.status(400).json({message: 'Empty request body'})
+                return res.status(400).json({message: 'Provide email and password!'})
             }
 
         const agency = await Agency.findOne({
@@ -165,7 +173,7 @@ const authenticate = async (req, res, next) => {
         })
         if(!agency)
         {
-            res.status(404).json({message: 'Agency not found!'})
+            return res.status(404).json({message: 'Agency not found!'})
         }
 
         const isValid = await bcrypt.compare(req.body.account_password, agency.account_password)
@@ -195,12 +203,12 @@ const authenticate = async (req, res, next) => {
             payload.logo_url = agency.logo_url
             res.status(200).json(payload)
         } else {
-            res.status(401).json({message: 'Invalid credentials!'})
+            return res.status(401).json({message: 'Invalid credentials!'})
         }
         
     } catch (err) {
         console.log(err)
-        res.status(400).json({message: err.message})
+        return res.status(400).json({message: err.message})
     }
 }
 
@@ -221,6 +229,33 @@ const lougout = async (req, res, next) => {
     }
 }
 
+const saveSubcription = async (req, res, next) => {
+
+    try {
+         const { agencyId, subscription } = req.body;
+
+        if (!agencyId || !subscription)
+        {
+            return res.status(400).send("Missing data");
+        }
+
+        const agency = await Agency.findByPk(agencyId);
+        if (!agency) {
+            return res.status(404).send("Agency not found");
+        }
+
+        agency.pushSubscription = JSON.stringify(subscription);
+        await agency.save()
+
+        res.status(200).send("Subscription saved");
+        
+    } catch (err) {
+        console.log(err)
+        return res.status(400).json({message: err.message})
+    }
+       
+}
+
 export default {
     getAllAgencies,
     getAllAgents,
@@ -230,5 +265,6 @@ export default {
     deleteAgencyAccount,
     getAgencyProfile,
     lougout,
+    saveSubcription
     
 }

@@ -48,12 +48,18 @@ const AgencyRegistration = () => {
         setForm({ ...form, [e.target.name]: e.target.value })
     }
 
+
+
     const registerCompany = async (e) => {
         e.preventDefault();
 
-        const payload = {...form, company_phone :`${prefix}${form.company_phone}`}
+        const payload = {
+            ...form, 
+            company_phone :`${prefix}${form.company_phone}`
+        }
 
         await agencyApi.registerAgency(payload)
+        nav('/')
     }
 
     const logInAgency = async (e) => {
@@ -78,7 +84,7 @@ const AgencyRegistration = () => {
             >
 
                 <Card sx={{ width: 400, p: 4, borderRadius: 4, boxShadow: 6 }}>
-                    <Tabs value={tab} onChange={(e, newVal) => setTab(newVal)} centered>
+                    <Tabs value={tab} onChange={ (e, newVal) => setTab(newVal)} centered>
                         <Tab label="Login" />
                         <Tab label="Sign Up" />
                     </Tabs>

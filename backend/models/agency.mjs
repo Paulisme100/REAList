@@ -10,7 +10,8 @@ const Agency = sequelize.define('Agency', {
     cui: { type: DataTypes.STRING, allowNull: false },
     commission_at_sale: {type: DataTypes.STRING},
     commission_at_rent: {type: DataTypes.STRING},
-    logo_url: { type: DataTypes.STRING}
+    logo_url: { type: DataTypes.STRING},
+    pushSubscription: {type: DataTypes.TEXT}
   }, 
   { timestamps: true }
 );

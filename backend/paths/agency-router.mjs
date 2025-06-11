@@ -9,6 +9,7 @@ agencyRouter.get('/agents', middlewares.verifyToken, agencyController.getAllAgen
 agencyRouter.post('/', agencyController.registerAgency)
 agencyRouter.post('/login', agencyController.authenticate)
 agencyRouter.post('/logout', agencyController.lougout)
+agencyRouter.post('/save-subscription', agencyController.saveSubcription)
 agencyRouter.get('/profile', middlewares.verifyToken, agencyController.getAgencyProfile)
 
 agencyRouter.put('/', middlewares.verifyToken, middlewares.uploadOne.single('logo'), agencyController.updateAgencyAccount)

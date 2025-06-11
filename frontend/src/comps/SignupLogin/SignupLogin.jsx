@@ -24,6 +24,7 @@ const SignupLogin = () => {
         password: '',
         role: 'regular'
     })
+    const [birthDateError, setBirthDateError] = useState('');
     const nav = useNavigate()
 
     const handleChange = (e) => {
@@ -60,6 +61,19 @@ const SignupLogin = () => {
 
     const registerUser = async (e) => {
         e.preventDefault()
+
+        if (form.role === 'agent' && form.birth_date) {
+            const birthDate = new Date(form.birth_date);
+            const today = new Date();
+
+            const ageDiff = today.getFullYear() - birthDate.getFullYear();
+
+            if(ageDiff < 18)
+            {
+                setBirthDateError("You must be at least 18 years old.");
+                return;
+            }
+        }
         
         try {
             const response = await fetch(`${SERVER_URL}/users/register`,
@@ -175,6 +189,31 @@ const SignupLogin = () => {
                                 <MenuItem value="regular">Owner</MenuItem>
                                 <MenuItem value="agent">Agent</MenuItem>
                             </TextField>
+
+            
+                            {form.role === "agent" && (
+                                <>
+                                    <TextField
+                                        label="Birth Date"
+                                        name="birth_date"
+                                        type="date"
+                                        InputLabelProps={{ shrink: true }}
+                                        value={form.birth_date || ''}
+                                        onChange={handleChange}
+                                        fullWidth
+                                        error={!!birthDateError}
+                                        helperText={birthDateError}
+                                    />
+                                    <TextField
+                                        label="Agency ID"
+                                        name="AgencyId"
+                                        type="number"
+                                        value={form.AgencyId || ''}
+                                        onChange={handleChange}
+                                        fullWidth
+                                    />
+                                </>
+                            )}
 
                             <Box mt={2} textAlign="center">
                                 <Typography variant="body2">

@@ -1,7 +1,15 @@
+import webpush from 'web-push'
 import User from "../models/user.mjs";
 import Agency from "../models/agency.mjs";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+
+webpush.setVapidDetails(
+  'mailto:pavelv2913@gmail.com',
+  process.env.VAPID_PUBLIC_KEY,
+  process.env.VAPID_PRIVATE_KEY
+)
 
 const getAllUsers = async (req, res, next) => {
     try {
@@ -49,7 +57,6 @@ const deleteById = async (req, res, next) => {
         res.status(400).json({message: err.message})
     }
 }
-
 const registerNewUser = async (req, res, next) => {
     try {
         if(!req.body || !req.body.name || !req.body.email || !req.body.password || !req.body.role)
@@ -67,11 +74,45 @@ const registerNewUser = async (req, res, next) => {
         if(req.body.AgencyId)
         {
             fields.AgencyId = req.body.AgencyId
+            fields.agentStatus = 'pending';
+        }
+
+        if(req.body.birth_date) {
+            fields.birth_date = req.body.birth_date
         }
 
         const user = await User.create({
             ...fields
         })
+
+
+        if (user.role === 'agent' && user.AgencyId) {
+
+            const agency = await Agency.findByPk(user.AgencyId)
+
+            if (agency?.pushSubscription) {
+                const payload = JSON.stringify({
+                    title: 'Agent Request',
+    
+                body: `${user.name} requested to join your agency.`,
+                    url: 'http://localhost:4173/#/agency-main'
+                });
+            
+
+
+                try {
+                    console.log('Sending push to:', agency.company_email)
+                    await webpush.sendNotification(
+                        JSON.parse(agency.pushSubscription),
+                        payload
+                    );
+                    
+                } catch (err) {
+                console.error("Push error:", err);
+                }
+            }
+        }
+
         res.status(200).json({message: "User added!"})
         
     } catch (err) {
@@ -102,6 +143,7 @@ const authenticate = async (req, res, next) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                agentStatus: user.agentStatus,
                 accountType: 'user'
             }
 
@@ -215,14 +257,11 @@ const updateUser = async (req, res, next) => {
             user.AgencyId = req.body.AgencyId
         }
 
-        // if(req.query.updateField === 'password')
-        // {
-        //     user[req.query.updateField] = await bcrypt.hash(req.query.updateValue, 10)
-
-        // } else {
-        //     user[req.query.updateField] = req.query.updateValue
-        // }
-
+        if(req.body.agentStatus)
+        {
+            user.agentStatus= req.body.agentStatus
+        }
+        
         await user.save()
         res.status(200).json({message: 'User data changed successfully'})
         

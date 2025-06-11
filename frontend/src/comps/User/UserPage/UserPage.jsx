@@ -92,6 +92,12 @@ const UserPage = () => {
             <Typography variant="subtitle1">
                 <strong>Role:</strong> {user.role}
             </Typography>
+            {
+            user.role === 'agent' && 
+            (<Typography variant="subtitle1">
+                <strong>Agent Status:</strong> {user.agentStatus}
+            </Typography>)
+            }
         </Box>
 
         <Stack direction="row" spacing={2} mb={3}>
