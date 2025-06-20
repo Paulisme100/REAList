@@ -1,18 +1,46 @@
 import {Card, CardContent, Typography, Avatar, Box, Button, Stack } from "@mui/material"
 import { useNavigate, Link } from "react-router-dom"
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import agencyApi from "../../fetches/agency/agencyApi";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import CancelIcon from '@mui/icons-material/Cancel'
+import DeleteIcon from '@mui/icons-material/Delete'
+import agencyApi from "../../fetches/agency/agencyApi"
+import SERVER_URL from "../../../serverConnection/IpAndPort"
+
 
 const AgentCard = ({agent, refreshAgents}) => {
 
     const nav = useNavigate()
 
+    const deleteAgent = async (agentId) => {
+        const res = await fetch(`${SERVER_URL}/users/${agentId}`, {
+            method: 'delete',
+            credentials: 'include'
+        })
+
+    }
+
     return(
-        <Card elevation={2} sx={{padding: 2}}>
+        <Card elevation={2} sx={{ padding: 2, position: "relative" }}>
+
+            <Box position="absolute" top={8} right={8}>
+                <Button
+                    variant="outlined"
+                    color="error"
+                    size="small"
+                    startIcon={<DeleteIcon />}
+                    onClick={() => {
+                        deleteAgent(agent.id)
+                    }}
+                >
+                    Fire
+                </Button>
+            </Box>
+
             <Box display="flex" alignItems="center" gap={2}>
                 <Avatar sx={{ width: 56, height: 56 }}>
-                    {agent.name.charAt(0).toUpperCase()}
+                    {
+                        agent.name.charAt(0).toUpperCase()
+                    }
                 </Avatar>
             </Box>
             <Box>

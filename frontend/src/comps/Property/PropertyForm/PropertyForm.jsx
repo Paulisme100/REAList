@@ -136,22 +136,30 @@ const PropertyForm = () => {
         ))}
       </TextField>
 
-      {selectedCounty && (
-        <TextField
-          label="Locality"
-          select
-          name="locality"
-          value={formData.locality}
-          onChange={handleChange}
-          required
-        >
-          {localities.map(locality => (
-            <MenuItem key={locality} value={locality}>{locality}</MenuItem>
-          ))}
-        </TextField>
-      )}
+      {
+        selectedCounty && (
+          <TextField
+            label="Locality"
+            select
+            name="locality"
+            value={formData.locality}
+            onChange={handleChange}
+            required
+          >
+            {
+              localities.map(locality => (
 
-      {/* Image Upload & Preview */}
+                <MenuItem key={locality} value={locality}>
+                    {locality}
+                </MenuItem>
+
+              ))
+            }
+          </TextField>
+        )
+      }
+
+      
       <Button
         variant="outlined"
         component="label"

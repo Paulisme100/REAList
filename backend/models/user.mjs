@@ -13,7 +13,7 @@ const User = sequelize.define('User', {
     birth_date: { type: DataTypes.DATEONLY, allowNull: true },
     phone_number: { type: DataTypes.STRING, allowNull: true },
     agentStatus: { type: DataTypes.ENUM('accepted', 'pending', 'rejected'), allowNull: true},
-    pushSubscription: { type: DataTypes.JSON, allowNull: true }
+    pushSubscription: { type: DataTypes.TEXT, allowNull: true }
   }, 
   { timestamps: true }
 );

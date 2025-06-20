@@ -13,6 +13,7 @@ import {
     CardMedia,
     IconButton,
     Tooltip
+
   } from "@mui/material";
 import { Bed, Bathtub, SquareFoot, CalendarMonth } from "@mui/icons-material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -25,6 +26,12 @@ const PropertyDetails = () => {
     const params = useParams()
     const [property, setProperty] = useState()
     const [isSaved, setIsSaved] = useState(false)
+    const [agency, setAgency] = useState()
+
+    const getAgency = async (userId) => {
+      const res = await fetch(`${SERVER_URL}/agencies?userId=${userId}`)
+      return res.json()
+    }
 
     useEffect(() => {
         getListingsById(params.lid).then(data => 
@@ -32,16 +39,7 @@ const PropertyDetails = () => {
             setProperty(data)
           }
         )
-        // if(user)
-        // {
-        //   markedProperties.showSaved(user.id, params.lid).then(propArr => {
-        //     if(propArr){
-        //       setIsSaved(true)
-        //       console.log('Property is saved')
-        //     }
-            
-        //   })
-        // }
+        
     }, [])
 
     useEffect(() => {
@@ -58,8 +56,24 @@ const PropertyDetails = () => {
     }, [user, params.lid]);
 
     useEffect(() => {
-      console.log("isSaved: " + isSaved)
-    }, [isSaved]);
+
+        // if (property?.User?.role === 'agent') {
+        //   getAgency(property.User.id).then(agencies => {
+        //     if (agencies?.length) {
+        //       setAgency(agencies[0]);
+        //     }
+        //   });
+        // }
+         if(property) {
+          getAgency(property.User.id).then(agencies => {
+            console.log(agencies[0])
+            setAgency(agencies[0])
+          })
+        }
+        console.log("the third use effect is executed: ", property)
+
+    }, [property])
+
 
     if (!property) {
         return <Typography variant="h6">Loading property details...</Typography>;
@@ -203,7 +217,42 @@ const PropertyDetails = () => {
           
           <Box>
             <Typography variant="body2" color="text.secondary">
-              Posted by: <strong>{property.User.name}</strong>
+              {
+                property.User.role == 'regular' && (
+                  <>
+                    Posted by: <strong>{property.User.name}</strong>
+                  </>
+                )
+              }
+
+              {
+                property.User.role == 'agent' && (
+                  <>
+                    Posted by: <strong>
+                    {
+                      agency?.company_name ? (
+                        <>
+                          
+                          {
+                          agency.logo_url && (
+                              <CardMedia
+                                component="img"
+                                height="160"
+                                image={`${SERVER_URL}${agency.logo_url}`}
+                                alt="Agency Logo"
+                                style={{ objectFit: "contain", borderRadius: 12 }}
+                              />
+                          )}
+                          <div>{agency.company_name}</div>
+                        </>
+                        
+                      ) : "Not found"
+                    }
+                    </strong> 
+                  </>
+                )
+              }
+              
             </Typography>
           </Box>
         </Box>

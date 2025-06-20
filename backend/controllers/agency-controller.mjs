@@ -155,10 +155,6 @@ const getAgencyProfile = async (req, res, next) => {
     }
 }
 
-const deleteAgent = async (req, res, next) => { 
-//TO DO
-}
-
 const authenticate = async (req, res, next) => {
     try {
         if(!req.body || !req.body.company_email ||  !req.body.account_password)

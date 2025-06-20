@@ -5,8 +5,8 @@ import Listing from "../models/listing.mjs";
 const showSavedProperties = async (req, res, next) => {
 
     try {
-        if(!req.query.UserId) {
-            return res.status(400).json({message: 'There must be a user'})
+        if(!req.query.UserId && !req.query.ListingId) {
+            return res.status(400).json({message: 'There must specified the user or listing!'})
         }
 
         let filterQuery = {

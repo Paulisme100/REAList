@@ -11,10 +11,13 @@ self.addEventListener('push', function (event) {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      data: {url: "http://localhost:4173/#/agency-main"},
+      data: {url: data.url},
       requireInteraction: true 
-    }).then(() => console.log('[SW] Notification shown'))
-    .catch(err => console.error('[SW] Notification error:', err))
+    }).then(() => {
+      
+      console.log('[SW] Notification shown')
+
+    }).catch(err => console.error('[SW] Notification error:', err))
   )
 
 })

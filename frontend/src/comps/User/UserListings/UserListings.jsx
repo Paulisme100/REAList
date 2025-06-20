@@ -13,6 +13,7 @@ import AuthStore from "../../stores/UserAuthStore";
 import fetchPropertiesByStatus from "../../fetches/fetchPropertiesByStatus";
 
 const UserListings = () => {
+
   const { user } = AuthStore();
   const [tab, setTab] = useState(0);
   const [activeListings, setActiveListings] = useState([]);
@@ -30,9 +31,9 @@ const UserListings = () => {
             fetchPropertiesByStatus("inactive")
         ]);
 
-        setActiveListings(active.filter(l => l.UserId === user.id));
+        setActiveListings(active.filter(listing => listing.UserId == user.id));
 
-        setInactiveListings(inactive.filter(l => l.UserId === user.id));
+        setInactiveListings(inactive.filter(listing => listing.UserId == user.id));
 
       } catch (err) {
 

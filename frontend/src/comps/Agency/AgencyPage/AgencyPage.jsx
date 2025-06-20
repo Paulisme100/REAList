@@ -90,6 +90,7 @@ const AgencyPage = () => {
     useEffect(() => {
         if (agency) {
             fetchAgents();
+            subscribeAgencyToPush(agency.id);
         }
     }, [agency])
 
@@ -164,7 +165,7 @@ const AgencyPage = () => {
                                 const setupPush = async () => {
                                     const granted = await ensureNotificationPermission();
                                     if (granted) {
-                                        await subscribeAgencyToPush(agency.id);
+                                        // await subscribeAgencyToPush(agency.id);
                                         alert("You subscribed to push notifications")
                                     }
                                 };

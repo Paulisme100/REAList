@@ -8,7 +8,10 @@ import Image from "./image.mjs";
 Agency.hasMany(User)
 User.belongsTo(Agency)
 
-User.hasMany(Listing)
+User.hasMany(Listing, {
+    onDelete: 'CASCADE',
+    hooks: true
+})
 Listing.belongsTo(User)
 
 Locality.hasMany(Listing)

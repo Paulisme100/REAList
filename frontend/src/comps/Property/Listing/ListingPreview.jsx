@@ -1,6 +1,7 @@
 import SERVER_URL from "../../../serverConnection/IpAndPort"
 import { Link, useNavigate } from "react-router-dom"
 import AuthStore from "../../stores/UserAuthStore";
+import AgencyAuthStore from "../../stores/AgencyAuthStore";
 import changeListingStatus from "../../fetches/changeStatus";
 import {
     Card,
@@ -10,13 +11,20 @@ import {
     Box,
     Chip,
     Button,
-    Stack
+    Stack,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions
   } from "@mui/material";
+import { useState } from "react";
 
 const Listing = ({listing}) => {
 
     const {user} = AuthStore()
+    const {agency} = AgencyAuthStore()
     const nav = useNavigate()
+    const [confirmOpen, setConfirmOpen] = useState(false);
 
     const furtherPath = `/listings/${listing.id}`
     const editPath = `/add-property`
@@ -110,32 +118,22 @@ const Listing = ({listing}) => {
                                     listing.ad_status == "active" ? "Deactivate" : "Activate"
                                 }
                             </Button>
-                            { listing.ad_status == "inactive" && (
-                                <Button
-                                    variant="contained"
-                                    color="error"
-                                    fullWidth
-                                    sx={{ borderRadius: 2, textTransform: "none" }}
-                                    onClick={() => {
-
-                                        const deleteListing = async () => {
-                                            const url = `${SERVER_URL}/listings/${listing.id}`
-                                            const res = await fetch(url, {
-                                                method: 'delete',
-                                                credentials: "include"
-                                            })
-                                            console.log(await res.json())
-                                        }
-
-
-                                        deleteListing()
-                                    }}
-                                    >
-                                    Delete
-                                </Button>)
-                            }
-                        </>
+                            </>
                         )}
+
+                        { 
+                            ((listing.ad_status == "inactive" && user?.id === listing.UserId)  || agency) && (
+                            <Button
+                                variant="contained"
+                                color="error"
+                                fullWidth
+                                sx={{ borderRadius: 2, textTransform: "none" }}
+                                onClick={() => setConfirmOpen(true)}
+                                >
+                                Delete
+                            </Button>)
+                        }
+                    
                     </Stack>
 
                 </Card>
@@ -146,6 +144,32 @@ const Listing = ({listing}) => {
                 </Typography>
             )
         }
+            <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+                    <DialogTitle>Confirm Deletion</DialogTitle>
+                    <DialogContent>
+                        Are you sure you want to delete this listing? This action cannot be undone.
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setConfirmOpen(false)} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={() => {
+                            const deleteListing = async () => {
+                                const url = `${SERVER_URL}/listings/${listing.id}`
+                                const res = await fetch(url, {
+                                    method: 'delete',
+                                    credentials: "include"
+                                })
+                                console.log(await res.json())
+                                nav(user ? "/profile" : "/agency-main");
+                            }
+
+                            deleteListing()
+                        }} color="error" variant="contained">
+                            Delete
+                        </Button>
+                    </DialogActions>
+            </Dialog>       
         </>
     )
 }

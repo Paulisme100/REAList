@@ -1,9 +1,11 @@
+import webpush from 'web-push'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { Op, Sequelize } from "sequelize";
 import User from "../models/user.mjs";
 import Listing from "../models/listing.mjs";
+import SavedProperty from '../models/saved_property.mjs';
 import Locality from "../models/locality.mjs";
 import Image from "../models/image.mjs";
 
@@ -46,6 +48,8 @@ const getAllListings = async (req, res, next) => {
         if(req.query.UserId) {
             filterQuery.where.UserId = req.query.UserId
         }
+
+        console.log("filterQuery.where.UserId: ", filterQuery.where.UserId)
 
         if(req.query.title) {
 
@@ -144,7 +148,7 @@ const getAllListings = async (req, res, next) => {
         filterQuery.include = [
             {
                 model: User,
-                attributes: ['id', 'name'],
+                attributes: ['id', 'name', 'email', 'role'],
                 required: false
             }, 
             {
@@ -181,7 +185,7 @@ const getListingById = async (req, res, next) => {
             include: [
                 {
                     model: User,
-                    attributes: ['id', 'name'],
+                    attributes: ['id', 'name', 'email', 'role'],
                     required: true
                 }, 
                 {
@@ -354,7 +358,43 @@ const updateListing = async (req, res, next) => {
                 fields.LocalityId = localityId
             }
 
+            let oldPrice = listing.price
+            
             listing.update(fields)
+
+            if(oldPrice > req.body.price){
+                const savedProperties = await SavedProperty.findAll({
+                    where: { ListingId: listing.id },
+                    include: {
+                        model: User,
+                        attributes: ['id', 'email', 'pushSubscription']
+                    }
+                })
+
+                if(savedProperties){
+                    for(const entry of savedProperties) {
+                        const user = entry.User
+
+                        if(user.pushSubscription) {
+
+                            try {
+
+                                await webpush.sendNotification(
+                                    JSON.parse(user.pushSubscription), 
+                                    JSON.stringify({
+                                        title: "Price Drop!",
+                                        body: `A listing you saved had dropped its price from €${oldPrice} to €${listing.price}: ${listing.title}`,
+                                        url: `http://localhost:4173/#/user-listings`
+                                    })
+                                )
+                                
+                            } catch (err) {
+                                console.error("Push failed :", err.message)
+                            }
+                        }
+                    }
+                }
+            }
 
             if (req.files && req.files.length > 0) {
                 const images = req.files.map(file =>

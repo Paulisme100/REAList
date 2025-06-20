@@ -38,6 +38,25 @@ const clearTokenCookie = async () => {
     console.log(message)
 }
 
+const subscribeUserToPush = async (userId) => {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription =  await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: 'BCj0rdS4ziUUDLy3pGa43D_D5Aau6ncPLQfJ5WV0WWBBtBEO-djbxphdExnW-G-LYCzaD0ztEUYsgzXP2nHZN4I'
+        })
+
+        const res = await fetch(`${SERVER_URL}/users/save-subscription`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                userId, 
+                subscription
+            })
+        })
+
+    }
+
 const UserPage = () => {
 
     const nav = useNavigate()
@@ -68,6 +87,13 @@ const UserPage = () => {
         nav('/')
     }
     
+    useEffect(() => {
+
+        if(user){
+            subscribeUserToPush(user.id).then(() => console.log("User subscribed to push notifications!"))
+        }
+
+    }, [])
     
     return (
     <Box maxWidth="600px" mx="auto" mt={5} px={2}>
@@ -93,10 +119,21 @@ const UserPage = () => {
                 <strong>Role:</strong> {user.role}
             </Typography>
             {
-            user.role === 'agent' && 
-            (<Typography variant="subtitle1">
-                <strong>Agent Status:</strong> {user.agentStatus}
-            </Typography>)
+                user.role === 'agent' && (
+                    <Typography variant="subtitle1">
+                        <strong>Agent Status:</strong>{" "}
+                        <span
+                            style={{
+                                color: user.agentStatus == "pending" ? "orange"
+                                    : user.agentStatus == "accepted" ? "green"
+                                    : user.agentStatus == "rejected" ? "red"
+                                    : "inherit"
+                            }}
+                        >
+                            {user.agentStatus}
+                        </span>
+                    </Typography>
+                )
             }
         </Box>
 

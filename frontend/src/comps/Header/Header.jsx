@@ -27,19 +27,22 @@ const Header = () => {
                         </Link>
                     </div>
 
-                    <div className='ad-prop action'>                   
-                        <Link to={path}>
-                            <div style={{textAlign: 'center'}}>
-                                <p>
-                                    <AiFillPlusCircle style={{margin: '0 auto', fontSize: '1.5em', cursor: 'pointer'}}></AiFillPlusCircle>
-                                </p>
-                            </div>
-                            <div>
-                                Advertise <br/> Property
-                            </div>
-                        </Link>
-                        
-                    </div>
+                    {!agency && (
+                        <div className='ad-prop action'>                   
+                            <Link to={path}>
+                                <div style={{textAlign: 'center'}}>
+                                    <p>
+                                        <AiFillPlusCircle style={{margin: '0 auto', fontSize: '1.5em', cursor: 'pointer'}}></AiFillPlusCircle>
+                                    </p>
+                                </div>
+                                <div>
+                                    Advertise <br/> Property
+                                </div>
+                            </Link>
+                            
+                        </div>
+                        )
+                    }
 
                     <div className='userArea action' style={{cursor: 'pointer'}}>
                         {

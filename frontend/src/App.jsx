@@ -22,13 +22,6 @@ import AgencyData from './comps/Agency/AgencyData/AgencyData'
 import AgentProfile from './comps/Agency/AgentProfile/AgentProfile'
 
 console.log(Notification.permission)
-navigator.serviceWorker.ready.then(reg => {
-      reg.showNotification('Manual Test', {
-        body: 'Is this visible?',
-        requireInteraction: true,
-        data: { url: 'localhost:4173/#/map' }
-      });
-    });
 
 function App() {
 
@@ -37,7 +30,7 @@ function App() {
   
   useEffect(() => {
 
-    // console.log("mortii tai")
+
     // console.log(Notification.permission);
 
 

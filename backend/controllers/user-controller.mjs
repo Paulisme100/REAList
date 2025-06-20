@@ -4,6 +4,7 @@ import Agency from "../models/agency.mjs";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import { DATEONLY } from 'sequelize';
 
 webpush.setVapidDetails(
   'mailto:pavelv2913@gmail.com',
@@ -19,10 +20,10 @@ const getAllUsers = async (req, res, next) => {
             filterQuery.where = {
                 [req.query.filterField]: req.query.filterValue
             }
-        }
+        }       
         
         const users = await User.findAll({...filterQuery,
-            attributes: ['name', 'email', 'role', 'AgencyId']
+            // attributes: ['name', 'email', 'role', 'AgencyId']
         })
         if(users.length > 0)
         {
@@ -39,14 +40,10 @@ const getAllUsers = async (req, res, next) => {
 
 const deleteById = async (req, res, next) => {
     try {        
-        const user = await User.findOne({
-            where: {
-                id: req.query.id
-            }
-        })
+        const user = await User.findByPk(req.params.id)
         if(user)
         {
-            user.destroy()
+            await user.destroy()
             res.status(200).json('User removed')
         } else {
             res.status(404).json({message: 'User not found'})
@@ -94,7 +91,7 @@ const registerNewUser = async (req, res, next) => {
                 const payload = JSON.stringify({
                     title: 'Agent Request',
     
-                body: `${user.name} requested to join your agency.`,
+                    body: `${user.name} requested to join your agency.`,
                     url: 'http://localhost:4173/#/agency-main'
                 });
             
@@ -147,6 +144,10 @@ const authenticate = async (req, res, next) => {
                 accountType: 'user'
             }
 
+            if(user.role == 'agent'){
+                payload.AgencyId = user.AgencyId
+            }
+
             const token = jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: '1h'})
             res.cookie('token', token, {
                 httpOnly: true,
@@ -168,20 +169,33 @@ const getUserProfile = async (req, res, next) => {
 
     try {
         if (req.user.accountType === 'user') {
-        const userProfile = await User.findOne({
-            where: { email: req.user.email },
-            attributes: { exclude: ['password'] }
-        });
 
-        if (!userProfile) {
-            return res.status(404).json({ message: 'User not found' });
+            let optionQuery = {}
+        
+            if(req.user.role == 'agent')
+            {
+                optionQuery.include = {
+                    model: Agency,
+                    attributes: ['company_name', 'logo_url'],
+                    required: false
+                }
+            }
+
+            const userProfile = await User.findOne({
+                where: { email: req.user.email },
+                attributes: { exclude: ['password'] },
+                optionQuery
+            });
+
+            if (!userProfile) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            return res.status(200).json({
+                ...userProfile.toJSON(),
+                accountType: 'user'
+            });
         }
-
-        return res.status(200).json({
-            ...userProfile.toJSON(),
-            accountType: 'user'
-        });
-    }
 
     if (req.user.accountType === 'agency') {
         const agencyProfile = await Agency.findOne({
@@ -193,10 +207,10 @@ const getUserProfile = async (req, res, next) => {
             return res.status(404).json({ message: 'Agency not found' });
         }
 
-      return res.status(200).json({
-        ...agencyProfile.toJSON(),
-        accountType: 'agency'
-      });
+        return res.status(200).json({
+            ...agencyProfile.toJSON(),
+            accountType: 'agency'
+        });
     }
 
     return res.status(400).json({ message: 'Invalid account type' });
@@ -260,6 +274,9 @@ const updateUser = async (req, res, next) => {
         if(req.body.agentStatus)
         {
             user.agentStatus= req.body.agentStatus
+            if(req.body.agentStatus == 'accepted') {
+                user.hire_date = new Date().toISOString().split('T')[0]
+            }
         }
         
         await user.save()
@@ -271,6 +288,33 @@ const updateUser = async (req, res, next) => {
     }
 }
 
+const saveSubcription = async (req, res, next) => {
+
+    try {
+         const { userId, subscription } = req.body;
+
+        if (!userId || !subscription)
+        {
+            return res.status(400).send("Missing data");
+        }
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+
+        user.pushSubscription = JSON.stringify(subscription);
+        await user.save()
+
+        res.status(200).send("Subscription saved");
+        
+    } catch (err) {
+        console.log(err)
+        return res.status(400).json({message: err.message})
+    }
+       
+}
+
 export default {
     getAllUsers,
     deleteById,
@@ -278,5 +322,6 @@ export default {
     authenticate,
     getUserProfile,
     logUserOut,
-    updateUser
+    updateUser,
+    saveSubcription
 }
