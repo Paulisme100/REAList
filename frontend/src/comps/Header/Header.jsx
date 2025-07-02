@@ -3,11 +3,14 @@ import {AiFillPlusCircle, AiOutlineUser} from 'react-icons/ai'
 import { Link } from 'react-router-dom'
 import AuthStore from '../stores/UserAuthStore'
 import AgencyAuthStore from "../stores/AgencyAuthStore"
+import { useState } from "react"
+import { useEffect } from "react"
 
 const Header = () => {
 
     const {user, login, logout} = AuthStore()
     const {agency, login: loginAgency, logout: logoutAgency} = AgencyAuthStore()
+    const [userName, setUserName] = useState('')
     let path = '/'
     if(user || agency)
     {
@@ -16,6 +19,15 @@ const Header = () => {
     else {
         path = '/login'
     }
+
+    useEffect(() => {
+
+        if(user) {
+            setUserName(user.name)
+        } else if(agency) {
+            setUserName(agency.company_name)
+        }
+    }, [user, agency])
 
     return(
         <>
@@ -49,12 +61,12 @@ const Header = () => {
                             user ? (
                                 <Link to='/profile'>
                                     <AiOutlineUser />
-                                    <p>{user.name}</p>
+                                    <p>{userName}</p>
                                 </Link>
                                 ) : agency ? (
                                 <Link to='/agency-main'>
                                     <AiOutlineUser />
-                                    <p>{agency.company_name}</p>
+                                    <p>{userName}</p>
                                 </Link>
                                 ) : (
                                 <Link to='/login'>

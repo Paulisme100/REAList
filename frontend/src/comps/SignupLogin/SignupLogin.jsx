@@ -22,7 +22,8 @@ const SignupLogin = () => {
         name: '',
         email: '',
         password: '',
-        role: 'regular'
+        role: 'regular',
+        phone_number: ''
     })
     const [birthDateError, setBirthDateError] = useState('');
     const nav = useNavigate()
@@ -178,6 +179,16 @@ const SignupLogin = () => {
                                 onChange={handleChange}
                                 fullWidth
                             />
+
+                            <TextField
+                                label="Phone Number"
+                                name="phone_number"
+                                type="tel"
+                                value={form.phone_number}
+                                onChange={handleChange}
+                                fullWidth
+                            />
+
                             <TextField
                                 select
                                 label="User type"
@@ -190,7 +201,6 @@ const SignupLogin = () => {
                                 <MenuItem value="agent">Agent</MenuItem>
                             </TextField>
 
-            
                             {form.role === "agent" && (
                                 <>
                                     <TextField

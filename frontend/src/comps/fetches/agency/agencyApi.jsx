@@ -17,17 +17,26 @@ const registerAgency = async (agencyData) => {
 
 const logInAsAgency = async (agencyData) => {
 
-    const url = `${SERVER_URL}/agencies/login`
-    const res = await fetch(url,{
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(agencyData),
-        credentials: 'include'
-    })
+    try {
 
-    return await res.json()
+        const url = `${SERVER_URL}/agencies/login`
+        const res = await fetch(url,{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(agencyData),
+            credentials: 'include'
+        })
+
+        return await res.json()
+        
+    } catch (err) {
+
+        throw new Error(err.message)
+        
+    }
+
 }
 
 const fetchProfile = async () => {
@@ -39,12 +48,19 @@ const fetchProfile = async () => {
 
 }
 
-const fetchAgents = async () => {
-    const res = await fetch(`${SERVER_URL}/agencies/agents`, {
-        credentials: 'include'
-    })
+const fetchAgents = async (AgencyId = '') => {
+    try {
 
-    return await res.json()
+        const res = await fetch(`${SERVER_URL}/agencies/agents?AgencyId=${AgencyId}`, {
+            credentials: 'include'
+        })
+
+        return await res.json()
+        
+    } catch (err) {
+        throw new Error(err.message)
+    }
+        
 }
 
 const fetchAgentsByStatus = async (agentStatus  = '') => {

@@ -23,7 +23,7 @@ const getAllUsers = async (req, res, next) => {
         }       
         
         const users = await User.findAll({...filterQuery,
-            // attributes: ['name', 'email', 'role', 'AgencyId']
+            attributes: {exclude: ['password']}
         })
         if(users.length > 0)
         {
@@ -65,7 +65,8 @@ const registerNewUser = async (req, res, next) => {
             name: req.body.name,
             email: req.body.email,
             password: await bcrypt.hash(req.body.password, 10),
-            role: req.body.role
+            role: req.body.role,
+            phone_number: req.body.phone_number
         }
 
         if(req.body.AgencyId)
@@ -139,6 +140,7 @@ const authenticate = async (req, res, next) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
+                phone_number: user.phone_number,
                 role: user.role,
                 agentStatus: user.agentStatus,
                 accountType: 'user'
@@ -148,11 +150,11 @@ const authenticate = async (req, res, next) => {
                 payload.AgencyId = user.AgencyId
             }
 
-            const token = jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: '1h'})
+            const token = jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: '12h'})
             res.cookie('token', token, {
                 httpOnly: true,
                 sameSite: 'lax',
-                maxAge: 3600000
+                maxAge: 3600000*12
             })
             res.status(200).json(payload)
         } else {
@@ -251,6 +253,10 @@ const updateUser = async (req, res, next) => {
 
         if(req.body.name){
             user.name = req.body.name
+        }
+
+        if(req.body.phone_number){
+            user.phone_number = req.body.phone_number
         }
 
         if(req.body.role){

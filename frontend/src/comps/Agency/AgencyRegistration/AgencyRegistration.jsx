@@ -12,7 +12,8 @@ import {
     InputLabel,
     MenuItem,
     Select,
-    Typography
+    Typography,
+    Alert
   } from '@mui/material'
 import SERVER_URL from "../../../serverConnection/IpAndPort"
 import { useNavigate, Link } from "react-router-dom"
@@ -31,6 +32,7 @@ const countryCodes = [
 const AgencyRegistration = () => {
 
     const {login: loginAgency} = AgencyAuthStore()
+    const [loginError, setLoginError] = useState(false);
 
     const [tab, setTab] = useState(0)
     const [form, setForm] = useState({
@@ -67,8 +69,15 @@ const AgencyRegistration = () => {
         e.preventDefault();
 
         const data = await agencyApi.logInAsAgency(form)
-        loginAgency(data)
-        nav('/agency-main')
+
+        if(data && data.company_email) {
+            loginAgency(data)
+            nav('/agency-main')
+        }
+        else {
+            setLoginError(true)
+        }
+        
     }
 
     return(
@@ -109,6 +118,14 @@ const AgencyRegistration = () => {
                                 onChange={handleChange}
                                 fullWidth
                             />
+
+                            {
+                                loginError && (
+                                    <Alert severity="error" onClose={() => setLoginError(false)}>
+                                        Incorrect email or password
+                                    </Alert>
+                                )
+                            }
 
                             <Button variant="contained" color="primary" type="submit" fullWidth>
                                 Enter agency account

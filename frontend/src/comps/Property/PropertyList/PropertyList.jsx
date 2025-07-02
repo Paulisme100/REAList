@@ -14,10 +14,18 @@ import {
   Button,
   Typography,
   TextField,
-  Collapse
+  Collapse,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  IconButton,
+  Divider
 } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
+import CloseIcon from "@mui/icons-material/Close"
+import MapIcon from '@mui/icons-material/Map';
 
+const propertyTypeOptions = ['house', 'apartment', 'commercial space', 'industrial space', 'land']
 
 const PropertyList = () => {
 
@@ -33,16 +41,21 @@ const PropertyList = () => {
     const [transactionType, setTransactionType] = useState('');
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [bedrooms, setBedrooms] = useState('');
-    const [bathrooms, setBathrooms] = useState('');
-    const [constructionYear, setConstructionYear] = useState('');
+    const [bathrooms, setBathrooms] = useState("");
+    const [constructionYear, setConstructionYear] = useState("");
     const [minSquareMeters, setMinSquareMeters] = useState('');
+    const [propertyTypes, setPropertyTypes] = useState([]);
+    const [showPropertyTypes, setShowPropertyTypes] = useState(false);
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const listingsPerPage = 6;
 
     useEffect(() => {
         
         fetchCounties().then(data => setCounties(data))
         fetchPropertiesByFields(selectedCounty, selectedLocality).then(listings => {
           setListings(listings)
-          console.log(listings)
+          // console.log(listings)
         })
     }, [])
 
@@ -65,16 +78,67 @@ const PropertyList = () => {
     }
 
     const handleFilterChange = () => {
-      fetchPropertiesByFields(selectedCounty, selectedLocality, searchText, '', transactionType, minPrice, maxPrice, bedrooms, bathrooms, constructionYear, minSquareMeters).then(data => setListings(data));
+      fetchPropertiesByFields(selectedCounty, selectedLocality, searchText, '', transactionType, minPrice, maxPrice, bedrooms, bathrooms, constructionYear, minSquareMeters, propertyTypes).then(data => setListings(data));
     };
 
     return (
         <>
 
           <Box sx={{ p: 4 }}>
-            <Typography variant="h5" gutterBottom>
-              Filter Properties
-            </Typography>
+            
+            <Box sx={{ mb: 3 }}>
+
+              <Button
+                variant="outlined"
+                onClick={() => setShowPropertyTypes((prev) => !prev)}
+              >
+                {showPropertyTypes ? 'Close' : 'Choose Type of Property'}
+              </Button>
+
+              <Collapse in={showPropertyTypes} timeout="auto" unmountOnExit>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                  gap: 1,
+                  mt: 2,
+                }}
+              >
+                {propertyTypeOptions.map((type) => (
+                  <FormControlLabel
+                    key={type}
+                    control={
+                      <Checkbox
+                        checked={propertyTypes.includes(type)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setPropertyTypes((prev) =>
+                            prev.includes(value)
+                              ? prev.filter((t) => t !== value)
+                              : [...prev, value]
+                          );
+                        }}
+                        value={type}
+                        size="small"
+                      />
+                    }
+                    label={type.charAt(0).toUpperCase() + type.slice(1)}
+                    sx={{
+                      border: '1px solid #ccc',
+                      borderRadius: '8px',
+                      padding: '4px 12px',
+                      backgroundColor: '#f9f9f9',
+                      '&:hover': {
+                        backgroundColor: '#f0f0f0',
+                      },
+                    }}
+                  />
+                ))}
+              </Box>
+            </Collapse>
+
+            </Box>
 
             <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
 
@@ -155,22 +219,27 @@ const PropertyList = () => {
             >
               Advanced Filters
             </Button>
+
             <Collapse in={showAdvanced} timeout="auto" unmountOnExit>
                 <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2, mt: 2 }}>
 
-                  <TextField
-                    label="Min Price"
-                    type="number"
-                    value={minPrice}
-                    onChange={(e) => setMinPrice(e.target.value)}
-                  />
+                  <FormControl sx={{ minWidth: 140 }}>
+                    <TextField
+                      label="Min Price"
+                      type="number"
+                      value={minPrice}
+                      onChange={(e) => setMinPrice(e.target.value)}
+                    />
+                  </FormControl>
 
-                   <TextField
-                    label="Max Price"
-                    type="number"
-                    value={maxPrice}
-                    onChange={(e) => setMaxPrice(e.target.value)}
-                  />
+                  <FormControl sx={{ minWidth: 140 }}>
+                    <TextField
+                      label="Max Price"
+                      type="number"
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(e.target.value)}
+                    />
+                  </FormControl>
 
                   <FormControl sx={{ minWidth: 140 }}>
                     <TextField
@@ -213,21 +282,79 @@ const PropertyList = () => {
               <br/>
 
           
-          <Link to='map'>
-            <Button>
-              Draw area on map
+          <Link to="map" style={{ textDecoration: 'none' }}>
+            <Button
+              variant="contained"
+              startIcon={<MapIcon />}
+              sx={{
+                mt: 2,
+                px: 3,
+                py: 1.5,
+                backgroundColor: "#2e7d32",
+                color: "#fff",
+                fontWeight: "bold",
+                fontSize: "16px",
+                borderRadius: "12px",
+                textTransform: "none",
+                '&:hover': {
+                  backgroundColor: "#1b5e20",
+                }
+              }}
+            >
+                Search on Map
             </Button>
           </Link>
 
-            {
-              Array.isArray(listings) && listings.length > 0 ? (
-                listings.map((listing) => (
-                  <Listing key={listing.id} listing={listing} />
-                ))
-              ) : (
-                <div>No listings found.</div>
-              )
-            }
+            <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                  gap: 1,
+                  mt: 2,
+                }}
+            >
+              {
+                Array.isArray(listings) && listings.length > 0 ? (
+                  listings
+                    .slice((currentPage - 1) * listingsPerPage, currentPage * listingsPerPage)
+                    .map((listing) => (
+                      <Listing key={listing.id} listing={listing} />
+                    ))
+                ) : (
+                  <div>No listings found.</div>
+                )
+              }
+            </Box>
+
+              <Box sx={{ mt: 4, display: "flex", justifyContent: "center", gap: 2 }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+
+                <Typography variant="body1" sx={{ lineHeight: "40px" }}>
+                  Page {currentPage} of {Math.ceil(listings.length / listingsPerPage)}
+                </Typography>
+
+                <Button
+                  variant="outlined"
+                  onClick={() =>
+                    setCurrentPage((prev) =>
+                      prev < Math.ceil(listings.length / listingsPerPage)
+                        ? prev + 1
+                        : prev
+                    )
+                  }
+                  disabled={currentPage >= Math.ceil(listings.length / listingsPerPage)}
+                >
+                  Next
+                </Button>
+              </Box>
+
           </Box>
 
         </>

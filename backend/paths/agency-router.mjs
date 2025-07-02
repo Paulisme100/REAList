@@ -6,6 +6,7 @@ const agencyRouter = Router()
 
 agencyRouter.get('/', agencyController.getAllAgencies)
 agencyRouter.get('/agents', middlewares.verifyToken, agencyController.getAllAgents)
+agencyRouter.get('/agent-ids', middlewares.verifyToken, agencyController.getAgentIds)
 agencyRouter.post('/', agencyController.registerAgency)
 agencyRouter.post('/login', agencyController.authenticate)
 agencyRouter.post('/logout', agencyController.lougout)

@@ -9,7 +9,7 @@ const Listing = sequelize.define('Listing',
             allowNull: false
         },
         propertyType: {
-            type: DataTypes.ENUM('house', 'apartment', 'condo', 'commercial space'),
+            type: DataTypes.ENUM('house', 'apartment', 'commercial space', 'industrial space', 'land'),
             allowNull: false
         },
         transactionType: {

@@ -17,7 +17,8 @@ import {
     DialogContent,
     DialogActions
   } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import agencyApi from "../../fetches/agency/agencyApi";
 
 const Listing = ({listing}) => {
 
@@ -25,12 +26,31 @@ const Listing = ({listing}) => {
     const {agency} = AgencyAuthStore()
     const nav = useNavigate()
     const [confirmOpen, setConfirmOpen] = useState(false);
+    const [agentIDs, setAgentIDs] = useState([])
 
     const furtherPath = `/listings/${listing.id}`
     const editPath = `/add-property`
     const imageUrl = listing.Images?.[0]?.url
     ? `${SERVER_URL}${listing.Images[0].url}` : ""
     
+    useEffect(() => {
+
+        async function getAgentIds() {
+            const res = await fetch(`${SERVER_URL}/agencies/agent-ids`, {
+                credentials: 'include'
+            })
+            return await res.json()
+        }
+
+        if(agency)
+        {
+            getAgentIds().then(data => {
+                let ids = data.map(item => item.id)
+                setAgentIDs(ids)
+            })
+        }
+
+    }, [])
 
     return (
         <>
@@ -38,7 +58,7 @@ const Listing = ({listing}) => {
             listing ? (
                 <Card
                 sx={{
-                    maxWidth: 345,
+                    width: 300,
                     borderRadius: 4,
                     boxShadow: 3,
                     m: 2,
@@ -57,7 +77,7 @@ const Listing = ({listing}) => {
                     />
 
                     <CardContent>
-                        <Typography variant="h6" component="div" gutterBottom> {/**se poate adauga nowrap daca e titlul prea lung */}
+                        <Typography variant="h6" component="div" gutterBottom>
                             {listing.title}
                         </Typography>
 
@@ -122,7 +142,7 @@ const Listing = ({listing}) => {
                         )}
 
                         { 
-                            ((listing.ad_status == "inactive" && user?.id === listing.UserId)  || agency) && (
+                            ((listing.ad_status == "inactive" && user?.id === listing.UserId)  || (agency && agentIDs.includes(listing.UserId))) && (
                             <Button
                                 variant="contained"
                                 color="error"

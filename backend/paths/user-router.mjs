@@ -13,6 +13,6 @@ userRouter.put('/:id', middlewares.verifyToken, controllers.userController.updat
 userRouter.delete('/:id', middlewares.verifyToken, controllers.userController.deleteById)
 userRouter.get('/profile', middlewares.verifyToken, controllers.userController.getUserProfile)
 userRouter.post('/logout', controllers.userController.logUserOut)
-userRouter.get('/user-listings', controllers.listingController.getAllListings)
+userRouter.get('/user-listings', middlewares.verifyToken, controllers.listingController.getAllListings)
 
 export default userRouter

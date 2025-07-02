@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import SERVER_URL from "../../../serverConnection/IpAndPort";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import getListingsById from "../../fetches/getListingById";
 import markedProperties from "../../fetches/markedProperties";
 import AuthStore from "../../stores/UserAuthStore";
@@ -12,26 +12,41 @@ import {
     Card,
     CardMedia,
     IconButton,
-    Tooltip
+    Tooltip,
+    Button
 
   } from "@mui/material";
 import { Bed, Bathtub, SquareFoot, CalendarMonth } from "@mui/icons-material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import PersonIcon from "@mui/icons-material/Person";
+import WorkIcon from "@mui/icons-material/Work";
 
 const PropertyDetails = () => {
 
     const {user} = AuthStore()
 
     const params = useParams()
+    const nav = useNavigate()
     const [property, setProperty] = useState()
     const [isSaved, setIsSaved] = useState(false)
     const [agency, setAgency] = useState()
+
+    const [showPhone, setShowPhone] = useState(false);
 
     const getAgency = async (userId) => {
       const res = await fetch(`${SERVER_URL}/agencies?userId=${userId}`)
       return res.json()
     }
+
+    const maskPhone = (number) => {
+      if (!number) 
+      {
+        return "Not provided";
+      }
+
+      return number.replace(/(\d{3})\d{3}(\d{3})/, "$1***$2");
+    };
 
     useEffect(() => {
         getListingsById(params.lid).then(data => 
@@ -57,13 +72,6 @@ const PropertyDetails = () => {
 
     useEffect(() => {
 
-        // if (property?.User?.role === 'agent') {
-        //   getAgency(property.User.id).then(agencies => {
-        //     if (agencies?.length) {
-        //       setAgency(agencies[0]);
-        //     }
-        //   });
-        // }
          if(property) {
           getAgency(property.User.id).then(agencies => {
             console.log(agencies[0])
@@ -141,6 +149,7 @@ const PropertyDetails = () => {
               display: "flex",
               flexWrap: "wrap",
               alignItems: "center",
+              justifyContent: 'center',
               gap: 2,
               mb: 3
             }}
@@ -159,25 +168,26 @@ const PropertyDetails = () => {
               display: "flex",
               gap: 4,
               mb: 3,
-              flexWrap: "wrap"
+              flexWrap: "wrap",
+              justifyContent: 'center'
             }}
           >
-            <Chip
-              icon={<Bed />}
-              label={`${property.bedrooms} Bedroom${property.bedrooms !== 1 ? "s" : ""}`}
-              variant="outlined"
-            />
-            <Chip
-              icon={<Bathtub />}
-              label={`${property.bathrooms} Bathroom${property.bathrooms !== 1 ? "s" : ""}`}
-              variant="outlined"
-            />
-            <Chip
-              icon={<CalendarMonth />}
-              label={`Built in ${property.constructionYear}`}
-              variant="outlined"
-            />
-          </Box>
+              <Chip
+                icon={<Bed />}
+                label={`${property.bedrooms} Bedroom${property.bedrooms !== 1 ? "s" : ""}`}
+                variant="outlined"
+              />
+              <Chip
+                icon={<Bathtub />}
+                label={`${property.bathrooms} Bathroom${property.bathrooms !== 1 ? "s" : ""}`}
+                variant="outlined"
+              />
+              <Chip
+                icon={<CalendarMonth />}
+                label={`Built in ${property.constructionYear}`}
+                variant="outlined"
+              />
+        </Box>
     
           
           <Box sx={{ mb: 3 }}>
@@ -215,45 +225,194 @@ const PropertyDetails = () => {
           )}
     
           
-          <Box>
-            <Typography variant="body2" color="text.secondary">
+          <Box sx={{display: 'flex', justifyContent: 'center', width: '100%'}}>
+            {/* <Typography variant="body2" color="text.secondary"> */}
               {
                 property.User.role == 'regular' && (
-                  <>
-                    Posted by: <strong>{property.User.name}</strong>
-                  </>
+                 
+                  <Box
+                    sx={{
+                    border: "1px solid #e0e0e0",
+                    borderRadius: 4,
+                    padding: 3,
+                    backgroundColor: "#fafafa",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 1.5,
+                    mt: 4,
+                    minWidth: {
+                      xs: "360px",
+                      sm: "600px"
+                    },
+                    maxWidth: {
+                      lg: "768px",  
+                    }
+                  }}
+                  >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          mb: 1,
+                        }}
+                      >
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ fontWeight: 600 }}
+                        >
+                          {property.User.name || "Unnamed User"}
+                        </Typography>
+
+                        <Tooltip title="Direct Owner">
+                          <PersonIcon color="success" fontSize="small" />
+                        </Tooltip>
+
+                      </Box>
+
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Email:</strong> {property.User.email || "N/A"}
+                      </Typography>
+
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Phone:</strong>{" "}
+                        {
+                          showPhone ? property.User.phone_number : maskPhone(property.User.phone_number)
+                        }
+                      </Typography>
+
+                      {!showPhone && property.User.phone_number && (
+                        <Button
+                          size="small"
+                          variant="text"
+                          sx={{ alignSelf: "center" }}
+                          onClick={() => setShowPhone(true)}
+                        >
+                          Show Phone
+                        </Button>
+                      )}
+
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        sx={{ alignSelf: "flex-start", mt: 1 }}
+                        onClick={() => nav(`/users/${property.UserId}`)}
+                      >
+                        More
+                      </Button>
+
+                  </Box>
                 )
               }
 
               {
                 property.User.role == 'agent' && (
-                  <>
-                    Posted by: <strong>
+                  
+                  <Box
+                    sx={{
+                      border: "1px solid #e0e0e0",
+                      borderRadius: 4,
+                      padding: 3,
+                      backgroundColor: "#f4f4f4",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 1.5,
+                      mt: 4,
+                      width: "100%",
+                      maxWidth: 500,
+                    }}
+                  >
+                    <div>Posted by:</div>
+
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                        {property.User.name}
+                      </Typography>
+                      <Tooltip title="Real Estate Agent">
+                        <WorkIcon color="primary" fontSize="small" />
+                      </Tooltip>
+                    </Box>
+
                     {
-                      agency?.company_name ? (
+                      agency ? (
                         <>
-                          
-                          {
-                          agency.logo_url && (
-                              <CardMedia
-                                component="img"
-                                height="160"
-                                image={`${SERVER_URL}${agency.logo_url}`}
-                                alt="Agency Logo"
-                                style={{ objectFit: "contain", borderRadius: 12 }}
-                              />
+                          {agency.logo_url && (
+                            <CardMedia
+                              component="img"
+                              height="140"
+                              image={`${SERVER_URL}${agency.logo_url}`}
+                              alt="Agency Logo"
+                              sx={{
+                                objectFit: "contain",
+                                borderRadius: 2,
+                                maxHeight: 100,
+                                maxWidth: "100%",
+                              }}
+                            />
                           )}
-                          <div>{agency.company_name}</div>
+                          <Typography variant="body2" color="text.secondary">
+                            Agent at <strong>{agency.company_name}</strong>
+                          </Typography>
                         </>
-                        
-                      ) : "Not found"
+                      ) : (
+                        <Typography variant="body2" color="error">
+                          Agency not found
+                        </Typography>
+                      )
                     }
-                    </strong> 
-                  </>
+
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Email:</strong> {property.User.email || "N/A"}
+                    </Typography>
+
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Phone:</strong>{" "}
+                      {
+                        showPhone ? property.User.phone_number : maskPhone(property.User.phone_number)
+                      }
+                    </Typography>
+
+                    {
+                      !showPhone && property.User.phone_number && (
+                          <Button
+                            size="small"
+                            variant="text"
+                            sx={{ alignSelf: "center" }}
+                            onClick={() => setShowPhone(true)}
+                          >
+                            Show Phone
+                          </Button>
+                      )
+                    }
+
+                    <Box sx={{ display: "flex", justifyContent: 'space-between', gap: 2, mt: 1 }}>
+                       <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => nav(`/users/${property.User.id}`)}
+                        >
+                          See agent
+                        </Button>
+
+                        {
+                          agency?.id && (
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={() => navigate(`/agency/${agency.id}`)}
+                            >
+                              See agency
+                            </Button>
+                          )
+                        }
+                    
+                    </Box>
+
+                  </Box>
                 )
               }
               
-            </Typography>
+            {/* </Typography> */}
           </Box>
         </Box>
       );

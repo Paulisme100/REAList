@@ -45,6 +45,7 @@ const Favorites = () => {
     
     return (
         <>
+            <Typography variant="h3" mt={2}>Saved properties</Typography>
             {
                 listings ? (
                     listings.map(listing => <Listing key={listing.id} listing={listing}></Listing>)

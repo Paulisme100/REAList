@@ -64,6 +64,11 @@ const PropertyForm = () => {
     }
   }, [selectedCounty])
 
+  const inputDataIsValid = () => {
+     
+    return true;
+  }
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
@@ -71,14 +76,17 @@ const PropertyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    if(inputDataIsValid)  {
+
+    }
+
     const form = new FormData()
     Object.entries(formData).forEach(([key, value]) => form.append(key, value))
     images.forEach(image => form.append('images', image))
 
     try {
       const method = editingListing ? 'PUT' : 'POST'
-      const url = editingListing
-        ? `${SERVER_URL}/listings/${editingListing.id}`
+      const url = editingListing ? `${SERVER_URL}/listings/${editingListing.id}`
         : `${SERVER_URL}/listings`
 
       const res = await fetch(url, {
@@ -87,11 +95,14 @@ const PropertyForm = () => {
         body: form
       })
 
-      if (!res.ok) throw new Error('Failed to submit listing')
+      if (!res.ok)  {
+          throw new Error('Failed to submit listing')
+      }
 
       const data = await res.json()
-      console.log('Submitted:', data)
+      // console.log('Submitted:', data)
       nav('/user-listings')
+
     } catch (err) {
       console.error(err)
     }
@@ -101,26 +112,41 @@ const PropertyForm = () => {
     <Box
       component="form"
       onSubmit={handleSubmit}
-      sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 600, margin: '0 auto' }}
+      sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 600, margin: '0 auto', padding: 3 }}
     >
       <Typography variant="h5">
         {editingListing ? 'Edit Your Listing' : 'Post Your Property'}
       </Typography>
 
-      {/* Form fields */}
+      
       <TextField name="title" label="Title" value={formData.title} onChange={handleChange} required />
       <TextField name="address" label="Address" value={formData.address} onChange={handleChange} required />
       <TextField name="price" label="Price €" type="number" value={formData.price} onChange={handleChange} required />
+
       <TextField name="propertyType" label="Property Type" select value={formData.propertyType} onChange={handleChange} required>
-        {['house', 'apartment', 'condo', 'commercial space'].map(type => (
-          <MenuItem key={type} value={type}>{type}</MenuItem>
-        ))}
+        {
+          ['house', 'apartment', 'commercial space', 'industrial space', 'land'].map(type => (
+            <MenuItem key={type} value={type}>
+                
+                {type}
+
+            </MenuItem>
+          ))
+        }
       </TextField>
+
       <TextField name="transactionType" label="Transaction Type" select value={formData.transactionType} onChange={handleChange} required>
-        {['sale', 'rent'].map(type => (
-          <MenuItem key={type} value={type}>{type}</MenuItem>
-        ))}
+        {
+          ['sale', 'rent'].map(type => (
+            <MenuItem key={type} value={type}>
+
+              {type}
+
+            </MenuItem>
+          ))
+        }
       </TextField>
+
       <TextField name="description" label="Description" multiline minRows={3} value={formData.description} onChange={handleChange} />
       <TextField name="bedrooms" label="Bedrooms" type="number" value={formData.bedrooms} onChange={handleChange} />
       <TextField name="bathrooms" label="Bathrooms" type="number" value={formData.bathrooms} onChange={handleChange} />
@@ -128,12 +154,19 @@ const PropertyForm = () => {
       <TextField name="constructionYear" label="Construction Year" type="number" value={formData.constructionYear} onChange={handleChange} />
 
       <TextField label="County" select value={selectedCounty} onChange={e => {
-        setSelectedCounty(e.target.value)
-        setFormData({ ...formData, locality: '' })
-      }} required>
-        {counties.map(county => (
-          <MenuItem key={county} value={county}>{county}</MenuItem>
-        ))}
+          setSelectedCounty(e.target.value)
+          setFormData({ ...formData, locality: '' })
+        }
+      } required>
+        {
+          counties.map(county => (
+            <MenuItem key={county} value={county}>
+
+              {county}
+
+            </MenuItem>
+          ))
+        }
       </TextField>
 
       {
@@ -176,26 +209,30 @@ const PropertyForm = () => {
       </Button>
 
       <Box display="flex" flexWrap="wrap" gap={1}>
-        {existingImages.map((img, idx) => (
-          <img
-            key={`existing-${idx}`}
-            src={`${SERVER_URL}${img.url}`}
-            alt={`existing-${idx}`}
-            width={100}
-            height="auto"
-            style={{ borderRadius: '8px', border: '1px solid #ccc' }}
-          />
-        ))}
-        {images.map((img, idx) => (
-          <img
-            key={`new-${idx}`}
-            src={URL.createObjectURL(img)}
-            alt="preview"
-            width={100}
-            height="auto"
-            style={{ borderRadius: '8px' }}
-          />
-        ))}
+        {
+          existingImages.map((img, idx) => (
+            <img
+              key={`existing-${idx}`}
+              src={`${SERVER_URL}${img.url}`}
+              alt={`existing-${idx}`}
+              width={100}
+              height="auto"
+              style={{ borderRadius: '8px', border: '1px solid #ccc' }}
+            />
+          ))
+        }
+        {
+          images.map((img, idx) => (
+            <img
+              key={`new-${idx}`}
+              src={URL.createObjectURL(img)}
+              alt="preview"
+              width={100}
+              height="auto"
+              style={{ borderRadius: '8px' }}
+            />
+          ))
+        }
       </Box>
 
       <FormHelperText>Up to 7 images allowed</FormHelperText>

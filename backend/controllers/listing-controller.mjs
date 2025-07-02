@@ -74,6 +74,19 @@ const getAllListings = async (req, res, next) => {
             filterQuery.where.ad_status = req.query.ad_status
         }
 
+        let propertyTypes;
+        if (req.query.propertyType) {
+            propertyTypes = Array.isArray(req.query.propertyType) ? req.query.propertyType : [req.query.propertyType]; 
+
+            //console.log("These are the selected types: ", propertyTypes);
+
+            if (propertyTypes.length > 0) {
+                filterQuery.where.propertyType = {
+                    [Op.in]: propertyTypes
+                };
+            }
+        }
+
         if(req.query.transactionType) {
             filterQuery.where.transactionType = req.query.transactionType.toLowerCase()
         }
@@ -148,7 +161,7 @@ const getAllListings = async (req, res, next) => {
         filterQuery.include = [
             {
                 model: User,
-                attributes: ['id', 'name', 'email', 'role'],
+                attributes: ['name', 'email', 'role', 'phone_number'],
                 required: false
             }, 
             {
@@ -158,10 +171,10 @@ const getAllListings = async (req, res, next) => {
             },
             localityRelObj
         ]
-    
+
 
         const listings = await Listing.findAll({
-            ...filterQuery,
+            ...filterQuery
         })
 
         if(listings.length > 0)
@@ -185,7 +198,7 @@ const getListingById = async (req, res, next) => {
             include: [
                 {
                     model: User,
-                    attributes: ['id', 'name', 'email', 'role'],
+                    attributes: ['id', 'name', 'email', 'role', 'phone_number'],
                     required: true
                 }, 
                 {

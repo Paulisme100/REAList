@@ -48,9 +48,11 @@ const getAllAgents = async (req, res, next) => {
         filterQuery.where.agentStatus = req.query.agentStatus
     }
 
+    let attributesQuery = { exclude: ["password"]}; 
+
     const agents = await User.findAll({
         ...filterQuery,
-        attributes:{ exclude: ["password"]}
+        attributesQuery
     })
 
     if(!agents){
@@ -60,6 +62,27 @@ const getAllAgents = async (req, res, next) => {
     }
 
 }
+
+const getAgentIds = async (req, res, next) => { 
+
+    if(!req.user.id){
+        return res.status(400).json({message: 'Company must be identified first!'})
+    }
+
+    let filterQuery = { 
+        where: {
+            AgencyId: req.user.id
+        }
+    }
+
+    const agents = await User.findAll({
+        ...filterQuery,
+        attributes: ['id']
+    })
+
+    return res.status(200).json(agents)
+}
+
 
 const registerAgency = async (req, res, next) => {
     try {
@@ -185,12 +208,12 @@ const authenticate = async (req, res, next) => {
                 accountType: 'agency'
             }
 
-            const token = jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: '1h'})
+            const token = jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: '12h'})
 
             res.cookie('token', token, {
                 httpOnly: true,
                 sameSite: 'lax',
-                maxAge: 3600000
+                maxAge: 3600000*12
             })
 
             payload.head_office_address = agency.head_office_address
@@ -261,6 +284,7 @@ export default {
     deleteAgencyAccount,
     getAgencyProfile,
     lougout,
-    saveSubcription
+    saveSubcription,
+    getAgentIds
     
 }

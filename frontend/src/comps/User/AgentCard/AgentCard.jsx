@@ -22,7 +22,7 @@ const AgentCard = ({agent, refreshAgents}) => {
     return(
         <Card elevation={2} sx={{ padding: 2, position: "relative" }}>
 
-            <Box position="absolute" top={8} right={8}>
+            {/* <Box position="absolute" top={8} right={8}>
                 <Button
                     variant="outlined"
                     color="error"
@@ -34,7 +34,7 @@ const AgentCard = ({agent, refreshAgents}) => {
                 >
                     Fire
                 </Button>
-            </Box>
+            </Box> */}
 
             <Box display="flex" alignItems="center" gap={2}>
                 <Avatar sx={{ width: 56, height: 56 }}>

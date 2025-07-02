@@ -19,11 +19,6 @@ import {
 } from "@mui/material";
 import AgentCard from "../../User/AgentCard/AgentCard";
 
-/**
- * 
- * @returns they want a more engaging and interactive interface.
-i want to offer them what other real-estate platforms didn't offer them. 
- */
 
 const AgencyPage = () => {
 

@@ -20,6 +20,8 @@ import AgencyAuthStore from './comps/stores/AgencyAuthStore'
 import agencyApi from './comps/fetches/agency/agencyApi'
 import AgencyData from './comps/Agency/AgencyData/AgencyData'
 import AgentProfile from './comps/Agency/AgentProfile/AgentProfile'
+import UserPublicProfile from './comps/User/UserPublicProfile/UserPublicProfile'
+import Footer from './comps/Footer/Footer'
 
 console.log(Notification.permission)
 
@@ -73,6 +75,7 @@ function App() {
             <>
               <Header></Header>
               <PropertyList></PropertyList>
+              <Footer></Footer>
             </>
           }>
           </Route>
@@ -80,6 +83,7 @@ function App() {
             <>
               <Header></Header>
               <PropertyList></PropertyList>
+              <Footer></Footer>
             </>
           }>
           </Route>
@@ -87,6 +91,7 @@ function App() {
             <>
               <Header></Header>
               <PropertyDetails></PropertyDetails>
+              <Footer></Footer>
             </>
           }>
           </Route>
@@ -101,6 +106,13 @@ function App() {
             <>
               <Header></Header>
               <UserPage></UserPage>
+            </>
+            }>            
+          </Route>
+          <Route path='/users/:id' element = {
+            <>
+              <Header></Header>
+              <UserPublicProfile></UserPublicProfile>
             </>
             }>            
           </Route>
