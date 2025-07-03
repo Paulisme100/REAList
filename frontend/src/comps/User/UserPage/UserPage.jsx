@@ -107,7 +107,7 @@ const UserPage = () => {
     }, [user.name, user.phone_number])
 
     return (
-        <Box maxWidth="600px" mx="auto" mt={5} px={2}>
+        <Box maxWidth="600px" mx="auto" my={5} px={2}>
             <Paper elevation={3} sx={{ padding: 4 }}>
                 <Typography variant="h4" gutterBottom>User Account</Typography>
                 <Divider sx={{ my: 2 }} />

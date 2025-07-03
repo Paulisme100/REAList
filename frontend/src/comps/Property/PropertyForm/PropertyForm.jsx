@@ -7,7 +7,8 @@ import {
   Box,
   FormControl,
   FormHelperText,
-  Typography
+  Typography,
+  Alert
 } from '@mui/material'
 import SERVER_URL from '../../../serverConnection/IpAndPort'
 import AuthStore from '../../stores/UserAuthStore'
@@ -43,6 +44,12 @@ const PropertyForm = () => {
   const [images, setImages] = useState([])
   const [existingImages, setExistingImages] = useState(editingListing?.Images || [])
 
+  const [priceIsValid, setPriceIsValid] = useState(true)
+  const [bedNumIsValid, setBedNumIsValid] = useState(true)
+  const [bathNumIsValid, setBathNumIsValid] = useState(true)
+  const [surfaceIsValid, setSurfaceIsValid] = useState(true)
+  const [yearIsValid, setYearIsValid] = useState(true)
+
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files)
     if (files.length + existingImages.length > 7) {
@@ -65,8 +72,40 @@ const PropertyForm = () => {
   }, [selectedCounty])
 
   const inputDataIsValid = () => {
-     
-    return true;
+
+    let isOk = true
+    
+    if(parseFloat(formData.price) < 0)
+    {
+        isOk = false
+        setPriceIsValid(false)       
+    }
+
+    if(parseInt(formData.bedrooms) < 0)
+    {
+        isOk = false
+        setBedNumIsValid(false)       
+    }
+
+    if(parseInt(formData.bathrooms) < 0)
+    {
+        isOk = false
+        setBathNumIsValid(false)       
+    }
+
+    if(parseInt(formData.squareMeters) < 0)
+    {
+        isOk = false
+        setSurfaceIsValid(false)      
+    }
+
+    if(parseInt(formData.constructionYear) < 1000)
+    {
+        isOk = false
+        setYearIsValid(false)       
+    }
+
+    return isOk;
   }
 
   const handleChange = (e) => {
@@ -76,36 +115,37 @@ const PropertyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if(inputDataIsValid)  {
+    if(inputDataIsValid())  {
 
-    }
+      const form = new FormData()
+      Object.entries(formData).forEach(([key, value]) => form.append(key, value))
+      images.forEach(image => form.append('images', image))
 
-    const form = new FormData()
-    Object.entries(formData).forEach(([key, value]) => form.append(key, value))
-    images.forEach(image => form.append('images', image))
+      try {
+        const method = editingListing ? 'PUT' : 'POST'
+        const url = editingListing ? `${SERVER_URL}/listings/${editingListing.id}`
+          : `${SERVER_URL}/listings`
 
-    try {
-      const method = editingListing ? 'PUT' : 'POST'
-      const url = editingListing ? `${SERVER_URL}/listings/${editingListing.id}`
-        : `${SERVER_URL}/listings`
+        const res = await fetch(url, {
+          method,
+          credentials: 'include',
+          body: form
+        })
 
-      const res = await fetch(url, {
-        method,
-        credentials: 'include',
-        body: form
-      })
+        if (!res.ok)  {
+            throw new Error('Failed to submit listing')
+        }
 
-      if (!res.ok)  {
-          throw new Error('Failed to submit listing')
+        const data = await res.json()
+        // console.log('Submitted:', data)
+        nav('/user-listings')
+
+      } catch (err) {
+        console.error(err)
       }
 
-      const data = await res.json()
-      // console.log('Submitted:', data)
-      nav('/user-listings')
-
-    } catch (err) {
-      console.error(err)
     }
+
   }
 
   return (
@@ -121,7 +161,13 @@ const PropertyForm = () => {
       
       <TextField name="title" label="Title" value={formData.title} onChange={handleChange} required />
       <TextField name="address" label="Address" value={formData.address} onChange={handleChange} required />
-      <TextField name="price" label="Price €" type="number" value={formData.price} onChange={handleChange} required />
+      <TextField name="price" label="Price €" type="number" value={formData.price} 
+                onChange={(e) => {
+                  handleChange(e)
+                  setPriceIsValid(true)
+                }} 
+                required error={!priceIsValid} helperText={ !priceIsValid ? "Price value is out of range." : ""}
+      />
 
       <TextField name="propertyType" label="Property Type" select value={formData.propertyType} onChange={handleChange} required>
         {
@@ -148,10 +194,34 @@ const PropertyForm = () => {
       </TextField>
 
       <TextField name="description" label="Description" multiline minRows={3} value={formData.description} onChange={handleChange} />
-      <TextField name="bedrooms" label="Bedrooms" type="number" value={formData.bedrooms} onChange={handleChange} />
-      <TextField name="bathrooms" label="Bathrooms" type="number" value={formData.bathrooms} onChange={handleChange} />
-      <TextField name="squareMeters" label="Square Meters" type="number" value={formData.squareMeters} onChange={handleChange} />
-      <TextField name="constructionYear" label="Construction Year" type="number" value={formData.constructionYear} onChange={handleChange} />
+
+      <TextField name="bedrooms" label="Bedrooms" type="number" value={formData.bedrooms} onChange={
+        (e) => {
+          handleChange(e)
+          setBedNumIsValid(true)
+        }
+      } error = {!bedNumIsValid} helperText={ !bedNumIsValid ? "Beds number is out of range" : ""}/>
+
+      <TextField name="bathrooms" label="Bathrooms" type="number" value={formData.bathrooms} onChange={(e) => {
+          handleChange(e)
+          setBathNumIsValid(true)
+        }
+      } error={!bathNumIsValid} helperText={!bathNumIsValid ? "Baths number is out of range" : ""}
+      />
+
+      <TextField name="squareMeters" label="Square Meters" type="number" value={formData.squareMeters} onChange={(e) => {
+          handleChange(e)
+          setSurfaceIsValid(true)
+        }
+      } error={!surfaceIsValid} helperText={!surfaceIsValid ? "Surface value is out of range" : ""}
+      />
+
+      <TextField name="constructionYear" label="Construction Year" type="number" value={formData.constructionYear} onChange={(e) => {
+            handleChange(e)
+            setYearIsValid(true)
+          }
+        } error={!yearIsValid} helperText={!yearIsValid ? "Value for year is out of range" : ""}
+      />
 
       <TextField label="County" select value={selectedCounty} onChange={e => {
           setSelectedCounty(e.target.value)

@@ -106,6 +106,7 @@ function App() {
             <>
               <Header></Header>
               <UserPage></UserPage>
+              <Footer></Footer>
             </>
             }>            
           </Route>
@@ -127,6 +128,7 @@ function App() {
             <>
               <Header></Header>
               <UserListings></UserListings>
+              <Footer></Footer>
             </>
             }>            
           </Route>
@@ -134,6 +136,7 @@ function App() {
             <>
               <Header></Header>
               <Favorites></Favorites>
+              <Footer></Footer>
             </>
             }>            
           </Route>
