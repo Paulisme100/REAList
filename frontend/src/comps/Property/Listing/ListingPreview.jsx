@@ -69,12 +69,28 @@ const Listing = ({listing}) => {
                     }
                 }}
                 >
-                    <CardMedia
-                        component="img"
-                        height="200"
-                        image={imageUrl}
-                        alt={listing.title}
-                    />
+                    {
+                        imageUrl ? (
+                            <CardMedia
+                                component="img"
+                                height="200"
+                                image={imageUrl}
+                                alt={listing.title}
+                            />
+                        ) : (
+                            <Box
+                                height="200px"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                bgcolor="#f0f0f0"
+                                color="#aaa"
+                                fontStyle="italic"
+                            >
+                                No Image Available
+                            </Box>
+                        )
+                    }
 
                     <CardContent>
                         <Typography variant="h6" component="div" gutterBottom>
