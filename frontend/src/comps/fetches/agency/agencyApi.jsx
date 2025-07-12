@@ -1,5 +1,21 @@
 import SERVER_URL from "../../../serverConnection/IpAndPort";
 
+const getAgencies = async (filterField = '', filterValue = '') => {
+
+    const url = `${SERVER_URL}/agencies?filterField=${filterField}&filterValue=${filterValue}`
+    const res = await fetch(url)
+
+    return await res.json()
+}
+
+const getAllListings = async (agencyId = '') => {
+
+    const url = `${SERVER_URL}/agencies/${agencyId}/listings`
+    const res = await fetch(url)
+
+    return await res.json()
+}
+
 const registerAgency = async (agencyData) => {
 
 
@@ -113,5 +129,7 @@ export default {
     fetchAgents,
     fetchAgentsByStatus,
     updateAgencyData,
-    changeAgentStatus
+    changeAgentStatus,
+    getAgencies,
+    getAllListings
 }

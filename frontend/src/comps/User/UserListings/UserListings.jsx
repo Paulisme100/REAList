@@ -23,17 +23,26 @@ const UserListings = () => {
   const fetchListings = async () => {
 
       setLoading(true);
+      console.log("user.id: ", user.id)
 
       try {
-        const [active, inactive] = await Promise.all([
-          
+        const [activeRes, inactiveRes] = await Promise.all([
             fetchPropertiesByStatus("active"),
             fetchPropertiesByStatus("inactive")
         ]);
 
-        setActiveListings(active.filter(listing => listing.UserId == user.id));
+        const active = Array.isArray(activeRes) ? activeRes : []
+        const inactive = Array.isArray(inactiveRes) ? inactiveRes : []
 
-        setInactiveListings(inactive.filter(listing => listing.UserId == user.id));
+        // console.log("Fetched active listings:", active);
+        // console.log("Fetched inactive listings:", inactive);
+
+        setActiveListings(active.filter(listing => String(listing.UserId) === String(user.id)));
+
+        setInactiveListings(inactive.filter(listing => String(listing.UserId) === String(user.id)));
+
+        //console.log("Filtered active listings:", filteredActive);
+        //console.log("Filtered inactive listings:", filteredInactive);
 
       } catch (err) {
 
@@ -48,7 +57,7 @@ const UserListings = () => {
 
   useEffect(() => {
     if (user?.id) {
-      fetchListings();
+      fetchListings().then(data => console.log("data: ", data));
     }
   }, [user]);
 
@@ -85,7 +94,7 @@ const UserListings = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <Grid container spacing={2} justifyContent="center">
+        <Grid container spacing={2} justifyContent="center" key={tab}>
           {(tab === 0 ? activeListings : inactiveListings).map((listing) => (
             <Grid item key={listing.id}>
               <Listing listing={listing} />

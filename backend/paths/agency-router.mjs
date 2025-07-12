@@ -5,6 +5,7 @@ import middlewares from "../middlewares/index.mjs";
 const agencyRouter = Router()
 
 agencyRouter.get('/', agencyController.getAllAgencies)
+agencyRouter.get('/:id/listings', agencyController.getListingsForAgency)
 agencyRouter.get('/agents', middlewares.verifyToken, agencyController.getAllAgents)
 agencyRouter.get('/agent-ids', middlewares.verifyToken, agencyController.getAgentIds)
 agencyRouter.post('/', agencyController.registerAgency)

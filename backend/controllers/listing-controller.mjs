@@ -1,4 +1,5 @@
 import webpush from 'web-push'
+import { Filter } from 'bad-words'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -18,6 +19,29 @@ const STOP_WORDS = new Set([
     'camere', 'zona', 'cartier', 'cu', 'spre', 'langa', 'din', 'aproape', 'de',
     'pentru', 'despre', 'inspre'
 ]);
+
+const DRUG_RELATED_TERMS = new Set([
+    'drug', 'drugs', 'dope', 'dough', 'marijuana', 'cocaine', 'heroine', 'fentanyl',
+    'lsd', 'mushrooms', 'codeine', 'ecstasy', 'mdma', 'spice',  
+])
+
+const MEDICAL_RELATED_TERMS = new Set([
+    'organs', 'kidney', 'kidneys', 'lung', 'lungs', 'heart', 'hearts', 'liver', 'livers',
+    'syringe', 'syringes', 'needle', 'needles', 'vein', 'veins'
+])
+
+const VIOLENCE_RELATED_TERMS = new Set([
+    'gun', 'guns', 'pistol', 'pistols', 'rifle', 'rifles', 'knife', 'knives'
+])
+
+const customWords = [
+  ...DRUG_RELATED_TERMS,
+  ...MEDICAL_RELATED_TERMS,
+  ...VIOLENCE_RELATED_TERMS
+]
+
+const filter = new Filter()
+filter.addWords(...customWords)
 
 const checkInt = (val) => {
     const parsed = parseInt(val);
@@ -270,6 +294,20 @@ const addListing = async (req, res, next) => {
             }
 
         let fields = req.body
+
+        let title = ''
+        let description = ''
+
+        if(fields.title && fields.description)
+        {
+            title = fields.title.trim()
+            description = fields.description.trim()
+        }
+
+        if(filter.isProfane(title.toLowerCase()) || filter.isProfane(description.toLowerCase()))
+        {
+            return res.status(422).json({moderationMessage: "Your content is inadmisible!"})
+        }
             
         const locality = await Locality.findOne({
             where: {

@@ -9,6 +9,7 @@ import {
     Button,
     MenuItem,
     Typography,
+    Alert,
     Link as MuiLink 
   } from '@mui/material'
 import SERVER_URL from "../../serverConnection/IpAndPort"
@@ -26,6 +27,9 @@ const SignupLogin = () => {
         phone_number: ''
     })
     const [birthDateError, setBirthDateError] = useState('');
+    const [loginError, setLoginError] = useState(false);
+    const [phoneError, setPhoneError] = useState(false);
+    const [nameError, setNameError] = useState(false);
     const nav = useNavigate()
 
     const handleChange = (e) => {
@@ -48,6 +52,7 @@ const SignupLogin = () => {
             )
     
             if(!response.ok){
+                setLoginError(true)
                 throw response;
             }
     
@@ -62,6 +67,23 @@ const SignupLogin = () => {
 
     const registerUser = async (e) => {
         e.preventDefault()
+
+        const fullName = form.name
+
+        for(let i = 0; i<fullName.length; i++){
+            if(!((fullName[i] >= 'a' && fullName[i] <= 'z') || (fullName[i] >= 'A' && fullName[i] <= 'Z') || fullName[i] == '-' || fullName[i] == "'" || fullName[i] == " "))
+            {
+                setNameError(true)
+                return
+            }
+        }
+
+        const prefix = form.phone_number.toString().slice(0, 2)
+        if((prefix != '02' && prefix != '03' && prefix != '07') || form.phone_number.toString().length != 10)
+        {
+            setPhoneError(true)
+            return 
+        }
 
         if (form.role === 'agent' && form.birth_date) {
             const birthDate = new Date(form.birth_date);
@@ -105,7 +127,8 @@ const SignupLogin = () => {
         <>
             <Box
                 sx={{
-                    height: '100vh',
+                    minHeight: '100%',
+                    padding: '4em',
                     backgroundColor: '#f3f4f6',
                     display: 'flex',
                     alignItems: 'center',
@@ -138,6 +161,14 @@ const SignupLogin = () => {
                             fullWidth
                             />
 
+                            {
+                                loginError && (
+                                    <Alert severity="error" onClose={() => setLoginError(false)}>
+                                        Incorrect email or password
+                                    </Alert>
+                                )
+                            }
+
                             <Box mt={2} textAlign="center">
                                 <Typography variant="body2">
                                         Do you have an agency account?{' '}
@@ -162,6 +193,8 @@ const SignupLogin = () => {
                                 value={form.name}
                                 onChange={handleChange}
                                 fullWidth
+                                error = {nameError}
+                                helperText={nameError? "Name should contain only letters" : "Introduce Surname first"}
                             />
                             <TextField
                                 label="Email"
@@ -187,6 +220,8 @@ const SignupLogin = () => {
                                 value={form.phone_number}
                                 onChange={handleChange}
                                 fullWidth
+                                error={phoneError}
+                                helperText= {phoneError ? "Invalid phone number!" : "Should begin with 02, 03 or 07"}
                             />
 
                             <TextField

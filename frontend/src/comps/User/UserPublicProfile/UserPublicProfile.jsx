@@ -120,11 +120,13 @@ const UserPublicProfile = () => {
 
             {userListings.length > 0 ? (
                 <Grid container spacing={3}>
-                {userListings.map((listing) => (
-                    <Grid item xs={12} sm={6} key={listing.id}>
-                    <Listing listing={listing} />
-                    </Grid>
-                ))}
+                {
+                    userListings.map((listing) => (
+                        <Grid item xs={12} sm={6} key={listing.id}>
+                            <Listing listing={listing} />
+                        </Grid>
+                    ))
+                }
                 </Grid>
             ) : (
                 <Typography color="text.secondary">No listings found for this user.</Typography>

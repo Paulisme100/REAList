@@ -17,12 +17,15 @@ Listing.belongsTo(User)
 Locality.hasMany(Listing)
 Listing.belongsTo(Locality)
 
-User.hasMany(SavedProperty, { foreignKey: 'UserId' });
+User.hasMany(SavedProperty, { foreignKey: 'UserId', onDelete: 'CASCADE', hooks: true });
 SavedProperty.belongsTo(User, { foreignKey: 'UserId' });
-Listing.hasMany(SavedProperty, { foreignKey: 'ListingId' });
+Listing.hasMany(SavedProperty, { foreignKey: 'ListingId', onDelete: 'CASCADE', hooks: true });
 SavedProperty.belongsTo(Listing, { foreignKey: 'ListingId' });
 
-Listing.hasMany(Image)
+Listing.hasMany(Image, {
+    onDelete: 'CASCADE',
+    hooks: true
+})
 Image.belongsTo(Listing)
 
 export default {

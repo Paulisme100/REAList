@@ -1,5 +1,6 @@
 import Agency from '../models/agency.mjs'
 import User from '../models/user.mjs'
+import Listing from '../models/listing.mjs'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import fs from "fs";
@@ -17,7 +18,7 @@ const getAllAgencies = async (req, res, next) => {
             }
         }
         const agencies = await Agency.findAll({...filterQuery,
-            attributes: {exclude: ["account_password"]}
+            attributes: {exclude: ["account_password", "pushSubscription"]}
         })
         if(agencies.length > 0)
         {
@@ -83,6 +84,53 @@ const getAgentIds = async (req, res, next) => {
     return res.status(200).json(agents)
 }
 
+const getListingsForAgency = async (req, res, next) => {
+
+    try {
+
+        // const agencyWithListings = await Agency.findByPk(req.params.id, {
+        //     include: {
+        //         model: User,
+        //         attributes: ["name", "email"],
+        //         where: { role: 'agent' },
+        //         include: Listing
+        //     }
+        // })
+
+        // res.status(200).json(agencyWithListings)
+
+        const agents = await User.findAll({
+            where: { AgencyId: req.params.id, role: 'agent' },
+            attributes: ['id'],
+        })
+
+        const agentIds = agents.map(agent => agent.id)
+
+        if (agentIds.length == 0){
+            return res.status(400).json({message: "No listings!"})
+        }
+
+        if (agentIds.length > 0) {
+            const listings = await Listing.findAll({
+                where: {
+                    UserId: agentIds,
+                }
+            })
+
+            if(listings.length > 0)
+            {
+                return res.status(200).json(listings)
+            } else {
+                return res.status(400).json({message: "No listings!"})
+            }
+            
+        }
+        
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({message: err.message})
+    }
+}
 
 const registerAgency = async (req, res, next) => {
     try {
@@ -285,6 +333,7 @@ export default {
     getAgencyProfile,
     lougout,
     saveSubcription,
-    getAgentIds
+    getAgentIds,
+    getListingsForAgency
     
 }

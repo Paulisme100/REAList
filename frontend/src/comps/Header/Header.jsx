@@ -1,16 +1,23 @@
 import "./Header.css"
 import {AiFillPlusCircle, AiOutlineUser} from 'react-icons/ai'
+import { HiOutlineMenuAlt3, HiOutlineX } from 'react-icons/hi'
 import { Link } from 'react-router-dom'
 import AuthStore from '../stores/UserAuthStore'
 import AgencyAuthStore from "../stores/AgencyAuthStore"
 import { useState } from "react"
 import { useEffect } from "react"
+import { Drawer, IconButton, Box, Typography, Divider } from "@mui/material"
+import MenuIcon from "@mui/icons-material/Menu"
+import CloseIcon from "@mui/icons-material/Close"
 
 const Header = () => {
 
     const {user, login, logout} = AuthStore()
     const {agency, login: loginAgency, logout: logoutAgency} = AgencyAuthStore()
     const [userName, setUserName] = useState('')
+
+    const [drawerOpen, setDrawerOpen] = useState(false)
+
     let path = '/'
     if(user || agency)
     {
@@ -78,6 +85,11 @@ const Header = () => {
                         
                     </div>
                    
+                   <div className="mobile-only">
+                        <IconButton>
+                            <MenuIcon fontSize="large"/>
+                        </IconButton>
+                   </div>
                 </div>
             </header>
         </>

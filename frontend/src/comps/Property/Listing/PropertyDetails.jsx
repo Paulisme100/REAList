@@ -226,7 +226,6 @@ const PropertyDetails = () => {
     
           
           <Box sx={{display: 'flex', justifyContent: 'center', width: '100%'}}>
-            {/* <Typography variant="body2" color="text.secondary"> */}
               {
                 property.User.role == 'regular' && (
                  
@@ -399,7 +398,7 @@ const PropertyDetails = () => {
                             <Button
                               variant="outlined"
                               size="small"
-                              onClick={() => navigate(`/agency/${agency.id}`)}
+                              onClick={() => nav(`/agencies/${agency.id}`)}
                             >
                               See agency
                             </Button>
@@ -412,7 +411,6 @@ const PropertyDetails = () => {
                 )
               }
               
-            {/* </Typography> */}
           </Box>
         </Box>
       );

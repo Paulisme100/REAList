@@ -89,17 +89,19 @@ const AgencyPage = () => {
         }
     }, [agency])
 
-    if(!agency || !agency.logo_url){
-        <Typography>
-            Loading...
-        </Typography>
+    if (!agency) {
+        return (
+            <Typography variant="h6" sx={{ mt: 4, textAlign: 'center' }}>
+            Loading agency data...
+            </Typography>
+        );
     }
 
     return(
         <Paper elevation={3} style={{ padding: "2rem", margin: "2rem auto", maxWidth: "1200px" }}>
             <Grid container spacing={4} alignItems="center">
                 <Grid item xs={12} sm={4}>
-                    {agency.logo_url ? (
+                    {(agency && agency.logo_url) ? (
                         <CardMedia
                             component="img"
                             height="160"

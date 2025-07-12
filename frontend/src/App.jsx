@@ -22,6 +22,7 @@ import AgencyData from './comps/Agency/AgencyData/AgencyData'
 import AgentProfile from './comps/Agency/AgentProfile/AgentProfile'
 import UserPublicProfile from './comps/User/UserPublicProfile/UserPublicProfile'
 import Footer from './comps/Footer/Footer'
+import AgencyPublicProfile from './comps/Agency/AgencyPublicProfile/AgencyPublicProfile'
 
 console.log(Notification.permission)
 
@@ -114,6 +115,14 @@ function App() {
             <>
               <Header></Header>
               <UserPublicProfile></UserPublicProfile>
+              <Footer></Footer>
+            </>
+            }>            
+          </Route>
+          <Route path='/agencies/:id' element = {
+            <>
+              <Header></Header>
+              <AgencyPublicProfile></AgencyPublicProfile>
             </>
             }>            
           </Route>
@@ -158,6 +167,7 @@ function App() {
             <>
               <Header></Header>
               <AgencyPage></AgencyPage>
+              <Footer></Footer>
             </>
             }>            
           </Route>
@@ -165,6 +175,7 @@ function App() {
             <>
               <Header></Header>
               <AgencyData></AgencyData>
+              <Footer></Footer>
             </>
             }>            
           </Route>
@@ -172,6 +183,7 @@ function App() {
             <>
               <Header></Header>
               <AgentProfile></AgentProfile>
+              <Footer></Footer>
             </>
           }>
           </Route>

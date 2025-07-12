@@ -8,6 +8,8 @@ import {
     Typography
 
   } from "@mui/material";
+  import FavoriteIcon from '@mui/icons-material/Favorite'
+
 
 const Favorites = () => {
 
@@ -16,8 +18,11 @@ const Favorites = () => {
     const [listings, setListings] = useState([])
 
     useEffect(() => {
-        markedProperties.showSaved(user.id).then(data => setFavorites(data))
-    }, [])
+        if(user){
+            markedProperties.showSaved(user.id).then(data => setFavorites(data))
+        }
+        
+    }, [user])
 
     useEffect(() => {
 
@@ -35,24 +40,30 @@ const Favorites = () => {
 
     }, [favorites])
 
-    if (!user.id) {
-        return <Typography variant="h6">No user connected</Typography>;
+    if (!user) {
+        return <Typography variant="h6">Loading user...</Typography>
     }
 
     if (favorites.length < 1) {
-            return <Typography variant="h6">You have not saved any property.</Typography>;
+        return <Typography variant="h6">You have not saved any property.</Typography>
     }
     
     return (
         <>
-            <Typography variant="h3" mt={2}>Saved properties</Typography>
+            <Typography
+                variant="h4"
+                mt={4}
+                mb={3}
+                align="center"
+                sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, fontWeight: 600 }}
+            >
+                Saved Properties
+            </Typography>
             {
-                listings ? (
+                listings.length >=1 ? (
                     listings.map(listing => <Listing key={listing.id} listing={listing}></Listing>)
                 ) : (
-                    <div>
-                        No listings available. Users may have been deleted them.
-                    </div>
+                    <Typography variant="h6" sx={{m: 4}}>You have not saved any property or you unsaved them.</Typography>
                 )
             }
         </>

@@ -84,7 +84,8 @@ const AgencyRegistration = () => {
         <div>
             <Box
                 sx={{
-                    height: '100vh',
+                    height: '100%',
+                    padding: '4em',
                     backgroundColor: '#f3f4f6',
                     display: 'flex',
                     alignItems: 'center',

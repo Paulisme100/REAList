@@ -39,10 +39,22 @@ const getAllUsers = async (req, res, next) => {
 }
 
 const deleteById = async (req, res, next) => {
-    try {        
+    try {       
+
         const user = await User.findByPk(req.params.id)
+
+        if (!req.user || req.user.id != req.params.id) {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
         if(user)
         {
+
+            res.clearCookie("token", {
+                httpOnly: true,
+                sameSite: 'lax'
+            })
+
             await user.destroy()
             res.status(200).json('User removed')
         } else {
