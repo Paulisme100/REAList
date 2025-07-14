@@ -23,6 +23,8 @@ import AgencyAuthStore from "../../stores/AgencyAuthStore"
 
 const countryCodes = [
   { code: '+40', label: 'Romania' },
+  { code: '+33', label: 'France' },
+  { code: '+49', label: 'Germany' },
   { code: '+44', label: 'UK' },
   { code: '+91', label: 'India' },
   { code: '+61', label: 'Australia' },
@@ -33,6 +35,8 @@ const AgencyRegistration = () => {
 
     const {login: loginAgency} = AgencyAuthStore()
     const [loginError, setLoginError] = useState(false);
+    const [cuiError, setCuiError] = useState(false);
+    const [phoneError, setPhoneError] = useState(false);
 
     const [tab, setTab] = useState(0)
     const [form, setForm] = useState({
@@ -54,6 +58,30 @@ const AgencyRegistration = () => {
 
     const registerCompany = async (e) => {
         e.preventDefault();
+
+        setCuiError(false)
+        setPhoneError(false)
+
+        const cui_prefix = form.cui.toString().slice(0, 2)
+
+        if (form.company_phone.length === 0 && form.company_phone.length > 10) 
+        { 
+            setPhoneError(true)
+            return false;
+        }
+        for (let i = 0; i < form.company_phone.length; i++) {
+            const charCode = form.company_phone.charCodeAt(i);
+            if (charCode < 48 || charCode > 57) {
+                setPhoneError(true)
+                return false;
+            }
+        }
+
+        if(cui_prefix != 'RO' || form.cui.length<4 || form.cui.length >12)
+        {
+            setCuiError(true)
+            return
+        }
 
         const payload = {
             ...form, 
@@ -152,6 +180,8 @@ const AgencyRegistration = () => {
                                 value={form.cui}
                                 onChange={handleChange}
                                 fullWidth
+                                error={cuiError}
+                                helperText= {cuiError ? "Invalid CUI!" : ""}
                             />
                             <TextField
                                 label="Company Email"
@@ -196,6 +226,8 @@ const AgencyRegistration = () => {
                                     value={form.company_phone}
                                     onChange={handleChange}
                                     placeholder="213 334 790"
+                                    error={phoneError}
+                                    helperText= {phoneError ? "Invalid phone!" : ""}
                                 />
                             </Stack>
 

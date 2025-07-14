@@ -184,15 +184,16 @@ const PropertyDetails = () => {
           </Box>
     
           
-          <Box
-            sx={{
-              display: "flex",
-              gap: 4,
-              mb: 3,
-              flexWrap: "wrap",
-              justifyContent: 'center'
-            }}
-          >
+          { property.propertyType != 'land' && (
+            <Box
+              sx={{
+                display: "flex",
+                gap: 4,
+                mb: 3,
+                flexWrap: "wrap",
+                justifyContent: 'center'
+              }}
+            >
               <Chip
                 icon={<Bed />}
                 label={`${property.bedrooms} Bedroom${property.bedrooms !== 1 ? "s" : ""}`}
@@ -208,7 +209,8 @@ const PropertyDetails = () => {
                 label={`Built in ${property.constructionYear}`}
                 variant="outlined"
               />
-        </Box>
+            </Box>)
+          }
     
           
           <Box sx={{ mb: 3 }}>

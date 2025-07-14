@@ -27,6 +27,11 @@ const AgencyData = () => {
         logo_url: "",
     })
 
+    const [cuiError, setCuiError] = useState(false);
+    const [phoneError, setPhoneError] = useState(false);
+    const [saleCommissionError, setSaleCommissionError] = useState(false);
+    const [rentCommissionError, setRentCommissionError] = useState(false);
+
     const [logoFile, setLogoFile] = useState(null)
     const [previewUrl, setPreviewUrl] = useState(null)
 
@@ -66,6 +71,56 @@ const AgencyData = () => {
     }
 
     const handleSubmit = async (e) => {
+        e.preventDefault()
+
+        setCuiError(false)
+        setPhoneError(false)
+        setSaleCommissionError(false)
+        setRentCommissionError(false)
+
+        const cui_prefix = form.cui.toString().slice(0, 2)
+
+        if(form.company_phone[0] != '+'){
+            setPhoneError(true)
+            return 
+        }
+
+        const form_num = form.company_phone.toString().slice(1, form.company_phone.length)
+        if (form_num.length === 0 && form_num.length > 11) 
+        { 
+            setPhoneError(true)
+            return ;
+        }
+        for (let i = 0; i < form_num.length; i++) {
+            const charCode = form_num.charCodeAt(i);
+            if (charCode < 48 || charCode > 57) {
+                setPhoneError(true)
+                return;
+            }
+        }
+
+        for (let i = 0; i < form.commission_at_sale.length; i++) {
+            const charCode = form.commission_at_sale.charCodeAt(i);
+            if (charCode < 48 || charCode > 57) {
+                setSaleCommissionError(true)
+                return;
+            }
+        }
+
+        for (let i = 0; i < form.commission_at_rent.length; i++) {
+            const charCode = form.commission_at_rent.charCodeAt(i);
+            if (charCode < 48 || charCode > 57) {
+                setRentCommissionError(true)
+                return;
+            }
+        }
+
+        if(cui_prefix != 'RO' || form.cui.length<4 || form.cui.length >12)
+        {
+            setCuiError(true)
+            return
+        }
+
         const formData = new FormData;
         
         Object.keys(form).forEach((key) => {
@@ -98,11 +153,13 @@ const AgencyData = () => {
                     </Grid>
 
                     <Grid item xs={12} sm={6}>
-                        <TextField label="Phone" name="company_phone" value={form.company_phone} onChange={handleInputChange} fullWidth />
+                        <TextField label="Phone" name="company_phone" value={form.company_phone} onChange={handleInputChange} fullWidth error={phoneError}
+                                    helperText= {phoneError ? "Invalid phone!" : ""}/>
                     </Grid>
 
                     <Grid item xs={12} sm={6}>
-                        <TextField label="CUI" name="cui" value={form.cui} onChange={handleInputChange} fullWidth />
+                        <TextField label="CUI" name="cui" value={form.cui} onChange={handleInputChange} fullWidth error={cuiError}
+                                helperText= {cuiError ? "Invalid CUI!" : ""}/>
                     </Grid>
 
                     <Grid item xs={12}>
@@ -110,11 +167,13 @@ const AgencyData = () => {
                     </Grid>
 
                     <Grid item xs={6}>
-                        <TextField label="Commission on Sale (%)" name="commission_at_sale" value={form.commission_at_sale} onChange={handleInputChange} fullWidth />
+                        <TextField label="Commission on Sale (%)" name="commission_at_sale" value={form.commission_at_sale} onChange={handleInputChange} fullWidth error={saleCommissionError}
+                                helperText= {saleCommissionError ? "Invalid commission!" : ""}/>
                     </Grid>
 
                     <Grid item xs={6}>
-                        <TextField label="Commission on Rent (%)" name="commission_at_rent" value={form.commission_at_rent} onChange={handleInputChange} fullWidth />
+                        <TextField label="Commission on Rent (%)" name="commission_at_rent" value={form.commission_at_rent} onChange={handleInputChange}  fullWidth error={rentCommissionError}
+                                helperText= {rentCommissionError ? "Invalid commission!" : ""} />
                     </Grid>
 
                     <Grid item xs={12}>

@@ -127,6 +127,7 @@ const AgencyPage = () => {
                 <Grid item xs={12} sm={4}>
                     {(agency && agency.logo_url) ? (
                         <CardMedia
+                            sx={{mr: 5}}
                             component="img"
                             height="160"
                             image={`${SERVER_URL}${agency.logo_url}`}
@@ -134,9 +135,9 @@ const AgencyPage = () => {
                             style={{ objectFit: "contain", borderRadius: 12 }}
                         />
                     ) : (
-                        <Avatar
+                        <Avatar 
                             variant="rounded"
-                            sx={{ width: 160, height: 160, fontSize: 32 }}
+                            sx={{ width: 160, height: 160, fontSize: 32, mr: 5 } }
                         >
                             No Logo
                         </Avatar>
