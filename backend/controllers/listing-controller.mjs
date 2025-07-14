@@ -466,6 +466,55 @@ const updateListing = async (req, res, next) => {
     }
 }
 
+const incrementViews = async (req, res, next) => {
+
+    try {
+
+        const listing = await Listing.findByPk(req.params.id)
+
+        if(!listing)
+        {
+            return res.status(404).json({message: "Listing not found!"})
+        } else {
+           
+            listing.views = listing.views + 1
+            await listing.save()
+            return res.status(200).json({message: "One more view."})          
+        }
+        
+    } catch (err) {
+        console.log(err)
+        return res.status(400).json({message: err.message})
+    }
+
+}
+
+const incrementPhoneReveals = async (req, res, next) => {
+
+    try {
+
+        const listing = await Listing.findByPk(req.params.id)
+
+        if(!listing)
+        {
+            return res.status(404).json({message: "Listing not found!"})
+        } else {
+
+            if(listing.UserId != req.user.id)
+            {
+                listing.phoneReveals = listing.phoneReveals + 1
+                await listing.save()
+                res.status(200).json({message: "One more phone reveal."})
+            }            
+        }
+        
+    } catch (err) {
+        console.log(err)
+        return res.status(400).json({message: err.message})
+    }
+
+}
+
 const changeStatus = async (req, res, next) => {
 
     try {
@@ -528,6 +577,8 @@ export default {
     getListingsWithinShape,
     addListing,
     updateListing,
+    incrementViews,
+    incrementPhoneReveals,
     deleteById,
     changeStatus
 }

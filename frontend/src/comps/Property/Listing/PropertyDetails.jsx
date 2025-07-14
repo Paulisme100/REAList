@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import getListingsById from "../../fetches/getListingById";
 import markedProperties from "../../fetches/markedProperties";
 import AuthStore from "../../stores/UserAuthStore";
+import AgencyAuthStore from "../../stores/AgencyAuthStore";
 import {
     Box,
     Typography,
@@ -21,22 +22,31 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import PersonIcon from "@mui/icons-material/Person";
 import WorkIcon from "@mui/icons-material/Work";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
 
 const PropertyDetails = () => {
 
     const {user} = AuthStore()
+    const {agency} = AgencyAuthStore()
 
     const params = useParams()
     const nav = useNavigate()
     const [property, setProperty] = useState()
     const [isSaved, setIsSaved] = useState(false)
-    const [agency, setAgency] = useState()
+    const [posterAgency, setPosterAgency] = useState(null)
 
     const [showPhone, setShowPhone] = useState(false);
 
     const getAgency = async (userId) => {
       const res = await fetch(`${SERVER_URL}/agencies?userId=${userId}`)
-      return res.json()
+      const agencies = await res.json()
+
+      if (agencies.length > 0) {
+        return agencies
+      } else {
+        return { message: "Agency not found" };
+      }
     }
 
     const maskPhone = (number) => {
@@ -47,6 +57,19 @@ const PropertyDetails = () => {
 
       return number.replace(/(\d{3})\d{3}(\d{3})/, "$1***$2");
     };
+
+    const incrementPhoneReveals = async () => {
+      if(property)
+      {
+        const url = `${SERVER_URL}/listings/${property.id}/phone-reveal`
+        const res = await fetch(url, {
+            method: 'put',
+            credentials: 'include'
+        })
+
+        await res.json()
+      }
+    }
 
     useEffect(() => {
         getListingsById(params.lid).then(data => 
@@ -63,8 +86,6 @@ const PropertyDetails = () => {
           if(Array.isArray(propArr))
           {
             setIsSaved(true);
-            console.log("For userid: ", user.id)
-            console.log(propArr) 
           }
         });
       }
@@ -72,13 +93,13 @@ const PropertyDetails = () => {
 
     useEffect(() => {
 
-         if(property) {
+         if(property && property.User.role == 'agent') {
+          
           getAgency(property.User.id).then(agencies => {
-            console.log(agencies[0])
-            setAgency(agencies[0])
+            setPosterAgency(agencies[0])
+            console.log("Poster agency: ", agencies[0].id)
           })
         }
-        console.log("the third use effect is executed: ", property)
 
     }, [property])
 
@@ -224,6 +245,37 @@ const PropertyDetails = () => {
             </Box>
           )}
     
+          {agency && agency?.id == posterAgency?.id && (
+            <Box
+              sx={{
+                border: "1px solid #cfd8dc",
+                borderRadius: 4,
+                padding: 3,
+                mt: 4,
+                backgroundColor: "#f9f9f9",
+                maxWidth: 600,
+                mx: "auto",
+              }}
+            >
+              <Typography variant="h6" gutterBottom>
+                Listing Performance
+              </Typography>
+
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+                <VisibilityIcon color="action" />
+                <Typography variant="body1" color="text.secondary">
+                  <strong>{property.views}</strong> views
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <PhoneAndroidIcon color="action" />
+                <Typography variant="body1" color="text.secondary">
+                  <strong>{property.phoneReveals}</strong> phone reveals
+                </Typography>
+              </Box>
+            </Box>
+          )}
           
           <Box sx={{display: 'flex', justifyContent: 'center', width: '100%'}}>
               {
@@ -272,7 +324,7 @@ const PropertyDetails = () => {
                       <Typography variant="body2" color="text.secondary">
                         <strong>Email:</strong> {property.User.email || "N/A"}
                       </Typography>
-
+                      
                       <Typography variant="body2" color="text.secondary">
                         <strong>Phone:</strong>{" "}
                         {
@@ -285,7 +337,16 @@ const PropertyDetails = () => {
                           size="small"
                           variant="text"
                           sx={{ alignSelf: "center" }}
-                          onClick={() => setShowPhone(true)}
+                          onClick={() => {
+
+                            if (!user && !agency) {
+                              nav('/login'); 
+                              return;
+                            }
+
+                            incrementPhoneReveals()
+                            setShowPhone(true)}
+                          }
                         >
                           Show Phone
                         </Button>
@@ -333,13 +394,13 @@ const PropertyDetails = () => {
                     </Box>
 
                     {
-                      agency ? (
+                      posterAgency ? (
                         <>
-                          {agency.logo_url && (
+                          {posterAgency.logo_url && (
                             <CardMedia
                               component="img"
                               height="140"
-                              image={`${SERVER_URL}${agency.logo_url}`}
+                              image={`${SERVER_URL}${posterAgency.logo_url}`}
                               alt="Agency Logo"
                               sx={{
                                 objectFit: "contain",
@@ -350,7 +411,7 @@ const PropertyDetails = () => {
                             />
                           )}
                           <Typography variant="body2" color="text.secondary">
-                            Agent at <strong>{agency.company_name}</strong>
+                            Agent at <strong>{posterAgency.company_name}</strong>
                           </Typography>
                         </>
                       ) : (
@@ -377,7 +438,16 @@ const PropertyDetails = () => {
                             size="small"
                             variant="text"
                             sx={{ alignSelf: "center" }}
-                            onClick={() => setShowPhone(true)}
+                            onClick={() => {
+
+                              if (!user && !agency) {
+                                nav('/login'); 
+                                return;
+                              }
+
+                              incrementPhoneReveals().then(data => console.log("phone reveal message: ", data))
+                              setShowPhone(true)}
+                            }
                           >
                             Show Phone
                           </Button>
@@ -394,11 +464,11 @@ const PropertyDetails = () => {
                         </Button>
 
                         {
-                          agency?.id && (
+                          posterAgency?.id && (
                             <Button
                               variant="outlined"
                               size="small"
-                              onClick={() => nav(`/agencies/${agency.id}`)}
+                              onClick={() => nav(`/agencies/${posterAgency.id}`)}
                             >
                               See agency
                             </Button>
@@ -412,6 +482,7 @@ const PropertyDetails = () => {
               }
               
           </Box>
+
         </Box>
       );
 };

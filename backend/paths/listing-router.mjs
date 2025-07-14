@@ -10,6 +10,8 @@ listingRouter.get('/:id', listingController.getListingById)
 listingRouter.post('/', middlewares.verifyToken, upload.array('images', 7), listingController.addListing)
 listingRouter.post('/by-shape', listingController.getListingsWithinShape)
 listingRouter.put('/:id', middlewares.verifyToken, upload.array('images', 7), listingController.updateListing)
+listingRouter.put('/:id/add-one-view', listingController.incrementViews)
+listingRouter.put('/:id/phone-reveal', middlewares.verifyToken, listingController.incrementPhoneReveals)
 listingRouter.delete('/:id', middlewares.verifyToken, listingController.deleteById)
 listingRouter.put('/status/:id', listingController.changeStatus)
 

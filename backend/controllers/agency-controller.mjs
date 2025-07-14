@@ -110,11 +110,23 @@ const getListingsForAgency = async (req, res, next) => {
             return res.status(400).json({message: "No listings!"})
         }
 
+        const orderFilter = {};
+        const limiter = {}
+        if (req.query.orderField) {
+            const field = req.query.orderField;
+            const direction = 'DESC'
+            orderFilter.order = [[field, direction]];
+
+            limiter.limit = 5
+        }
+
         if (agentIds.length > 0) {
             const listings = await Listing.findAll({
                 where: {
                     UserId: agentIds,
-                }
+                },
+                ...orderFilter,
+                ...limiter
             })
 
             if(listings.length > 0)

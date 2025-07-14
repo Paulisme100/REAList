@@ -24,6 +24,7 @@
   margin: 0 auto;
   padding: 1rem 2rem;
   display: flex;
+  flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
 }
@@ -78,14 +79,18 @@
     }
 
     .navbar-content {
-      flex-direction: column;
-      /* align-items: center; */
+      /* flex-direction: column;
+      align-items: center; */
       justify-content: space-between;
       gap: 1.5rem;
     }
 
     .mobile-only {
       display: block;
+    }
+
+    .desktop-only {
+      display: none;
     }
 
     .logo {

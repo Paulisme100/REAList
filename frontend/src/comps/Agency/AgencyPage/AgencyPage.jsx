@@ -17,7 +17,9 @@ import {
   Tooltip,
   Alert
 } from "@mui/material";
+import Leaderboard from '@mui/icons-material/Leaderboard';
 import AgentCard from "../../User/AgentCard/AgentCard";
+import Listing from "../../Property/Listing/ListingPreview";
 
 
 const AgencyPage = () => {
@@ -25,6 +27,7 @@ const AgencyPage = () => {
 
     const [acceptedAgents, setAcceptedAgents] = useState([])
     const [pendingAgents, setPendingAgents] = useState([])
+    const [mostViewedListings, setMostViewedListings] = useState([])
     const {agency, login: loginAgency, logout: logoutAgency} = AgencyAuthStore()
     const nav = useNavigate()
 
@@ -82,24 +85,45 @@ const AgencyPage = () => {
         agencyApi.fetchAgentsByStatus("pending").then(agentsArray => setPendingAgents(agentsArray));
     };
 
+    const getMostViewed =async () => {
+        try {
+
+            const res = await fetch(`${SERVER_URL}/agencies/${agency.id}/listings?orderField=views`, {
+                credentials: 'include'
+            })
+
+            return await res.json()
+        } catch(err) {
+            throw new Error(err.message)
+        }
+    }
+
     useEffect(() => {
         if (agency) {
             fetchAgents();
             subscribeAgencyToPush(agency.id);
+
+            getMostViewed().then(listings => {
+                if(Array.isArray(listings))
+                {
+                    setMostViewedListings(listings)
+                    console.log(listings)
+                }
+            })
         }
     }, [agency])
 
     if (!agency) {
         return (
             <Typography variant="h6" sx={{ mt: 4, textAlign: 'center' }}>
-            Loading agency data...
+                Loading agency data...
             </Typography>
         );
     }
 
     return(
         <Paper elevation={3} style={{ padding: "2rem", margin: "2rem auto", maxWidth: "1200px" }}>
-            <Grid container spacing={4} alignItems="center">
+            <Grid container spacing={4} alignItems="center" justifyContent='center'sx={{pr: 5}}>
                 <Grid item xs={12} sm={4}>
                     {(agency && agency.logo_url) ? (
                         <CardMedia
@@ -144,6 +168,7 @@ const AgencyPage = () => {
                             Manage Company Data
                         </Button>
                         <Button
+                            sx={{mt: 1}}
                             variant="outlined"
                             color="error"
                             onClick={() => {
@@ -221,6 +246,33 @@ const AgencyPage = () => {
                     </Grid>
                 </>
             )}
+
+            <Divider sx={{ my: 4 }} />
+
+            <Box sx={{ backgroundColor: '#f5f7fa', borderRadius: 4, padding: 3, boxShadow: 3, mt: 5 }}>
+                <Box display="flex" alignItems="center" justifyContent='center' mb={2} width='100%'>
+                    <Leaderboard sx={{ color: 'error.main', mr: 1 }} />
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#3f51b5' }}>
+                        Most Viewed Listings
+                    </Typography>
+                </Box>
+
+                {mostViewedListings.length === 0 ? (
+                    <Typography variant="body1" color="text.secondary">
+                    No listing views to display yet.
+                    </Typography>
+                ) : (
+                    <Grid container spacing={2}>
+                    {mostViewedListings.map(listing => (
+                        <Grid item key={listing.id} xs={12} sm={6} md={4}>
+                            <Listing listing={listing} />
+                        </Grid>
+                    ))}
+                    </Grid>
+                )}
+            </Box>
+
+
         </Paper>
     )
 

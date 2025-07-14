@@ -50,7 +50,18 @@ const Listing = sequelize.define('Listing',
         },
         geom: {
             type: DataTypes.GEOMETRY("POINT", 4326)
+        },
+        views: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0
+            
+        },
+        phoneReveals: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0
+            
         }
+
 
     }, 
     {

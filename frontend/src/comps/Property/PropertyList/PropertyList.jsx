@@ -140,7 +140,11 @@ const PropertyList = () => {
 
             </Box>
 
-            <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+            <Box sx={{ display: "flex",  flexWrap: {
+               xs: 'wrap', 
+              sm: 'wrap',  
+              md: 'nowrap'   
+            }, gap: 2, mb: 3 }}>
 
               <TextField
                 fullWidth
@@ -188,7 +192,10 @@ const PropertyList = () => {
                 </Select>
               </FormControl>
 
-              <FormControl sx={{ minWidth: 180 }}>
+              <FormControl sx={{ minWidth: 180, width: {
+                  xs: '100%',
+                  sm: 'auto'
+                } }}>
                     <InputLabel>Transaction Type</InputLabel>
                     <Select
                       value={transactionType}
@@ -205,7 +212,10 @@ const PropertyList = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleFilterChange}
-                sx={{ whiteSpace: "nowrap" }}
+                sx={{ whiteSpace: "nowrap", width: {
+                  xs: '100%',
+                  sm: 'auto'
+                } }}
               >
                 Apply
               </Button>
@@ -221,7 +231,7 @@ const PropertyList = () => {
             </Button>
 
             <Collapse in={showAdvanced} timeout="auto" unmountOnExit>
-                <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2, mt: 2 }}>
+                <Box sx={{ display: "flex", justifyContent: 'center', gap: 2, flexWrap: "wrap", mb: 2, mt: 2 }}>
 
                   <FormControl sx={{ minWidth: 140 }}>
                     <TextField

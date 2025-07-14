@@ -52,6 +52,15 @@ const Listing = ({listing}) => {
 
     }, [])
 
+    const incrementListingViews = async () => {
+        const url = `${SERVER_URL}/listings/${listing.id}/add-one-view`
+        const res = await fetch(url, {
+            method: 'put'
+        })
+
+        await res.json()
+    }  
+
     return (
         <>
         {
@@ -122,6 +131,10 @@ const Listing = ({listing}) => {
                                 variant="contained"
                                 fullWidth
                                 sx={{ borderRadius: 2, textTransform: "none" }}
+                                onClick={() => {
+                                    incrementListingViews()
+                                    }
+                                }
                             >
                                 See details
                             </Button>
